@@ -132,7 +132,7 @@ export default function MyProductsPage() {
         .products-reference .category-tab {
           height: 54px;
           border: 0;
-          border-radius: 999px;
+          border-radius: 28px 10px 28px 10px;
           padding: 0 18px;
           background: #fff;
           color: #999;
@@ -344,7 +344,7 @@ export default function MyProductsPage() {
           }
           .products-reference .category-tab {
             height: 50px;
-            border-radius: 999px;
+            border-radius: 26px 9px 26px 9px;
             padding: 0 12px;
             font-size: 15px;
           }
