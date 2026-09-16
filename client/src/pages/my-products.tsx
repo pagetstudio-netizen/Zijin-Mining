@@ -130,9 +130,10 @@ export default function MyProductsPage() {
           gap: 8px;
         }
         .products-reference .category-tab {
-          height: 55px;
+          height: 54px;
           border: 0;
-          border-radius: 17px;
+          border-radius: 999px;
+          padding: 0 18px;
           background: #fff;
           color: #999;
           font-size: clamp(16px, 4.4vw, 21px);
@@ -343,6 +344,8 @@ export default function MyProductsPage() {
           }
           .products-reference .category-tab {
             height: 50px;
+            border-radius: 999px;
+            padding: 0 12px;
             font-size: 15px;
           }
           .products-reference .product-list {
