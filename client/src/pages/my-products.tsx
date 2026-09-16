@@ -130,6 +130,8 @@ export default function MyProductsPage() {
           gap: 8px;
         }
         .products-reference .category-tab {
+          position: relative;
+          isolation: isolate;
           height: 54px;
           border: 0;
           border-radius: 28px 10px 28px 10px;
@@ -139,12 +141,30 @@ export default function MyProductsPage() {
           font-size: clamp(16px, 4.4vw, 21px);
           font-weight: 400;
           box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+          transition: color .35s ease, box-shadow .35s ease, transform .35s ease;
+        }
+        .products-reference .category-tab::before {
+          position: absolute;
+          z-index: -1;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(110deg, #0c61b9 0%, #03478d 100%);
+          content: "";
+          opacity: 0;
+          transition: opacity .35s ease;
         }
         .products-reference .category-tab.active {
-          background: linear-gradient(110deg, #0c61b9 0%, #03478d 100%);
           color: white;
           font-weight: 700;
           box-shadow: 0 3px 5px rgba(0, 54, 119, .25);
+          transform: translateY(-1px);
+        }
+        .products-reference .category-tab.active::before {
+          opacity: 1;
+        }
+        .products-reference .category-tab-label {
+          position: relative;
+          z-index: 1;
         }
         .products-reference .product-list {
           min-height: calc(100dvh - 190px);
@@ -391,7 +411,7 @@ export default function MyProductsPage() {
               className={`category-tab ${activeCategory === "stable" ? "active" : ""}`}
               onClick={() => setActiveCategory("stable")}
             >
-              Stabilisé
+              <span className="category-tab-label">Stabilisé</span>
             </button>
             <button
               type="button"
@@ -400,7 +420,7 @@ export default function MyProductsPage() {
               className={`category-tab ${activeCategory === "activity" ? "active" : ""}`}
               onClick={() => setActiveCategory("activity")}
             >
-              Activités
+              <span className="category-tab-label">Activités</span>
             </button>
           </div>
         </section>
