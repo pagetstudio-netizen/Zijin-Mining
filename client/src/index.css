@@ -409,6 +409,40 @@
   mask-size: contain;
 }
 
+/* Dashboard navigation — matches the supplied mobile reference. */
+.dashboard-bottom-nav {
+  height: 88px;
+  border-top-color: #ededed !important;
+}
+
+.dashboard-bottom-nav > div {
+  height: 88px !important;
+  max-width: 700px !important;
+  padding-bottom: 4px !important;
+}
+
+.dashboard-bottom-nav button {
+  gap: 4px;
+}
+
+.dashboard-bottom-nav .dashboard-bottom-icon {
+  width: 48px;
+  height: 48px;
+  color: #9aa0a4;
+}
+
+.dashboard-bottom-nav button:first-child .dashboard-bottom-icon,
+.dashboard-bottom-nav button:first-child .dashboard-bottom-label {
+  color: #19bd53 !important;
+}
+
+.dashboard-bottom-nav .dashboard-bottom-label {
+  color: #8f969b !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
 /* Country/operator picker — matches the compact reference picker on mobile. */
 .country-picker-overlay {
   position: fixed;
