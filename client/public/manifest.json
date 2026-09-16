@@ -1,7 +1,7 @@
 {
   "name": "Zijin Mining",
   "short_name": "Zijin Mining",
-  "description": "Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde. La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents.",
+  "description": "紫金矿业是全球领先的矿业和冶金企业，也是世界上最大的黄金生产商之一。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,15 +9,15 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.png?v=zijin-mining",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "/zijin-favicon.jpeg?v=zijin-mining",
+      "sizes": "225x225",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/favicon.png?v=zijin-mining",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/zijin-favicon.jpeg?v=zijin-mining",
+      "sizes": "225x225",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]

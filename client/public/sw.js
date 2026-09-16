@@ -1,5 +1,5 @@
-const CACHE_NAME = "zijin-mining-v1";
-const STATIC_ASSETS = ["/", "/manifest.json", "/favicon.png?v=zijin-mining"];
+const CACHE_NAME = "zijin-mining-v2";
+const STATIC_ASSETS = ["/", "/manifest.json", "/zijin-favicon.jpeg?v=zijin-mining"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
