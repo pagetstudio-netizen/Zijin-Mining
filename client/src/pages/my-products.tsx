@@ -150,10 +150,13 @@ export default function MyProductsPage() {
           padding: 57px 20px 25px;
         }
         .products-reference .product-card {
-          position: relative;
-          min-height: 254px;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 136px;
+          grid-template-rows: auto auto;
+          column-gap: 14px;
+          min-height: 0;
           margin-bottom: 25px;
-          overflow: hidden;
+          padding: 20px 19px 19px 20px;
           border-radius: 10px;
           background: #fff;
           box-shadow: 0 1px 4px rgba(0, 0, 0, .035);
@@ -170,9 +173,9 @@ export default function MyProductsPage() {
           text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
         }
         .products-reference .product-picture {
-          position: absolute;
-          top: 20px;
-          right: 19px;
+          grid-column: 2;
+          grid-row: 1;
+          align-self: start;
           width: 136px;
           height: 136px;
           overflow: hidden;
@@ -186,9 +189,11 @@ export default function MyProductsPage() {
           object-fit: cover;
         }
         .products-reference .product-details {
-          min-height: 167px;
-          margin-right: 166px;
-          padding: 22px 0 14px 20px;
+          grid-column: 1;
+          grid-row: 1;
+          min-width: 0;
+          min-height: 136px;
+          padding: 10px 0 0;
         }
         .products-reference .product-name {
           margin: 0 0 17px;
@@ -196,43 +201,52 @@ export default function MyProductsPage() {
           font-size: clamp(18px, 4.8vw, 23px);
           font-weight: 700;
           line-height: 1.15;
+          overflow-wrap: anywhere;
         }
         .products-reference .product-line {
+          display: flex;
+          min-width: 0;
+          align-items: baseline;
+          gap: 8px;
           margin: 0 0 11px;
           color: #333;
           font-size: clamp(14px, 3.7vw, 17px);
           line-height: 1.1;
-          white-space: nowrap;
+          overflow-wrap: anywhere;
         }
         .products-reference .product-line strong {
-          margin-left: 9px;
+          min-width: 0;
           color: #175488;
           font-weight: 400;
+          overflow-wrap: anywhere;
         }
         .products-reference .purchase-row {
-          position: absolute;
-          right: 19px;
-          bottom: 19px;
-          left: 20px;
+          grid-column: 1 / -1;
+          grid-row: 2;
           display: flex;
+          width: 100%;
           height: 66px;
+          min-width: 0;
           align-items: center;
           justify-content: space-between;
+          margin-top: 18px;
           border: 2px solid #303030;
           border-radius: 9px;
           padding-left: 9px;
           overflow: hidden;
         }
         .products-reference .product-price {
+          min-width: 0;
           color: #14548e;
           font-size: clamp(18px, 5vw, 24px);
           font-weight: 700;
           letter-spacing: -.3px;
+          overflow-wrap: anywhere;
           white-space: nowrap;
         }
         .products-reference .buy-button {
           display: flex;
-          width: 153px;
+          flex: 0 0 153px;
           height: 100%;
           align-items: center;
           justify-content: center;
@@ -343,29 +357,28 @@ export default function MyProductsPage() {
             padding-left: 14px;
           }
           .products-reference .product-card {
-            min-height: 236px;
+            grid-template-columns: minmax(0, 1fr) 116px;
+            column-gap: 10px;
+            padding: 16px 14px 14px 15px;
           }
           .products-reference .product-picture {
-            right: 14px;
             width: 116px;
             height: 116px;
           }
           .products-reference .product-details {
-            margin-right: 135px;
-            padding-top: 20px;
-            padding-left: 15px;
+            min-height: 116px;
+            padding-top: 8px;
           }
           .products-reference .product-line {
             font-size: 12px;
+            gap: 5px;
           }
           .products-reference .purchase-row {
-            right: 14px;
-            bottom: 14px;
-            left: 15px;
             height: 56px;
+            margin-top: 14px;
           }
           .products-reference .buy-button {
-            width: 125px;
+            flex-basis: 125px;
             font-size: 18px;
           }
         }
