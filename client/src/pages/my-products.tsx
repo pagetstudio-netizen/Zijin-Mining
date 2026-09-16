@@ -127,40 +127,44 @@ export default function MyProductsPage() {
           left: 13px;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 8px;
+          gap: var(--category-gap);
+          --category-gap: 8px;
+          isolation: isolate;
+        }
+        .products-reference .category-tabs::before {
+          position: absolute;
+          z-index: 0;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: calc((100% - var(--category-gap)) / 2);
+          border-radius: 28px 10px 28px 10px;
+          background: linear-gradient(110deg, #0c61b9 0%, #03478d 100%);
+          content: "";
+          transform: translateX(0);
+          transition: transform .42s cubic-bezier(.22, .8, .28, 1);
+        }
+        .products-reference .category-tabs.activity-active::before {
+          transform: translateX(calc(100% + var(--category-gap)));
         }
         .products-reference .category-tab {
           position: relative;
-          isolation: isolate;
+          z-index: 1;
           height: 54px;
           border: 0;
           border-radius: 28px 10px 28px 10px;
           padding: 0 18px;
-          background: #fff;
+          background: transparent;
           color: #999;
           font-size: clamp(16px, 4.4vw, 21px);
           font-weight: 400;
           box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-          transition: color .35s ease, box-shadow .35s ease, transform .35s ease;
-        }
-        .products-reference .category-tab::before {
-          position: absolute;
-          z-index: -1;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(110deg, #0c61b9 0%, #03478d 100%);
-          content: "";
-          opacity: 0;
-          transition: opacity .35s ease;
+          transition: color .3s ease, box-shadow .3s ease;
         }
         .products-reference .category-tab.active {
           color: white;
           font-weight: 700;
-          box-shadow: 0 3px 5px rgba(0, 54, 119, .25);
-          transform: translateY(-1px);
-        }
-        .products-reference .category-tab.active::before {
-          opacity: 1;
+          box-shadow: none;
         }
         .products-reference .category-tab-label {
           position: relative;
