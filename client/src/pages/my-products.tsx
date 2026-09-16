@@ -101,7 +101,7 @@ export default function MyProductsPage() {
         .products-reference .products-hero {
           position: relative;
           height: clamp(190px, 44vw, 220px);
-          overflow: hidden;
+          overflow: visible;
           background: #b68100;
         }
         .products-reference .products-hero::after {
@@ -207,18 +207,22 @@ export default function MyProductsPage() {
           display: flex;
           min-width: 0;
           align-items: baseline;
-          gap: 8px;
+          gap: 5px;
           margin: 0 0 11px;
           color: #333;
-          font-size: clamp(14px, 3.7vw, 17px);
+          font-size: clamp(11px, 2.7vw, 14px);
           line-height: 1.1;
-          overflow-wrap: anywhere;
+          white-space: nowrap;
+        }
+        .products-reference .product-line > span {
+          flex: 0 0 auto;
         }
         .products-reference .product-line strong {
+          flex: 0 1 auto;
           min-width: 0;
           color: #175488;
           font-weight: 400;
-          overflow-wrap: anywhere;
+          white-space: nowrap;
         }
         .products-reference .purchase-row {
           grid-column: 1 / -1;
@@ -370,7 +374,7 @@ export default function MyProductsPage() {
             padding-top: 8px;
           }
           .products-reference .product-line {
-            font-size: 12px;
+            font-size: 11px;
             gap: 5px;
           }
           .products-reference .purchase-row {
@@ -439,9 +443,9 @@ export default function MyProductsPage() {
                   </div>
                   <div className="product-details">
                     <h2 className="product-name">Récompenses VIP {index + 1}</h2>
-                    <p className="product-line">Revenu quotidien :<strong>{currency}{daily.toLocaleString("fr-FR")}</strong></p>
-                    <p className="product-line">Jours de revenu :<strong>{product.cycleDays} Jours</strong></p>
-                    <p className="product-line">Revenu total :<strong>{currency}{total.toLocaleString("fr-FR")}</strong></p>
+                    <p className="product-line"><span>Revenu quotidien :</span><strong>{currency}{daily.toLocaleString("fr-FR")}</strong></p>
+                    <p className="product-line"><span>Jours de revenu :</span><strong>{product.cycleDays} Jours</strong></p>
+                    <p className="product-line"><span>Revenu total :</span><strong>{currency}{total.toLocaleString("fr-FR")}</strong></p>
                   </div>
                   <div className="purchase-row">
                     <span className="product-price">{currency}{price.toFixed(2)}</span>
