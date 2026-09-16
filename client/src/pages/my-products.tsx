@@ -229,14 +229,14 @@ export default function MyProductsPage() {
           grid-row: 2;
           display: flex;
           width: 100%;
-          height: 58px;
+          height: 66px;
           min-width: 0;
           align-items: center;
           justify-content: space-between;
-          margin-top: 16px;
+          margin-top: 18px;
           border: 2px solid #303030;
           border-radius: 9px;
-          padding-left: 9px;
+          padding: 4px 4px 4px 9px;
           overflow: hidden;
         }
         .products-reference .product-price {
@@ -255,7 +255,7 @@ export default function MyProductsPage() {
           align-items: center;
           justify-content: center;
           border: 0;
-          border-radius: 9px;
+          border-radius: 7px;
           background: linear-gradient(105deg, #e02b29 0%, #b82b38 45%, #1a478d 100%);
           color: white;
           font-size: clamp(17px, 4.2vw, 21px);
@@ -378,8 +378,8 @@ export default function MyProductsPage() {
             gap: 5px;
           }
           .products-reference .purchase-row {
-            height: 52px;
-            margin-top: 13px;
+            height: 56px;
+            margin-top: 14px;
           }
           .products-reference .buy-button {
             flex-basis: 112px;
