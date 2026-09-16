@@ -161,17 +161,6 @@ export default function MyProductsPage() {
           background: #fff;
           box-shadow: 0 1px 4px rgba(0, 0, 0, .035);
         }
-        .products-reference .vip-mark {
-          position: absolute;
-          z-index: 2;
-          top: 0;
-          right: 0;
-          color: #d49a08;
-          font-size: 27px;
-          font-weight: 800;
-          line-height: 1;
-          text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
-        }
         .products-reference .product-picture {
           grid-column: 2;
           grid-row: 1;
@@ -437,7 +426,6 @@ export default function MyProductsPage() {
 
               return (
                 <article className="product-card" key={product.id} data-testid={`product-card-${product.id}`}>
-                  <span className="vip-mark">VIP.{index + 1}</span>
                   <div className="product-picture">
                     <img src={image} alt="" />
                   </div>
