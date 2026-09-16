@@ -1,297 +1,195 @@
-import { useAuth } from "@/lib/auth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { getCountryByCode } from "@/lib/countries";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useLocation } from "wouter";
-import checkinHero from "@assets/images_(82)_1789546290792.jpeg";
-import tonLogo from "@assets/images_(32)_1789546290870.png";
+import { useToast } from "@/hooks/use-toast";
 
-interface BonusStatus {
-  canClaim: boolean;
-  hoursRemaining: number;
-  totalBonusClaimed: number;
-  daysPointed: number;
-}
+import luckyDrawReference from "@assets/IMG-20260916-WA0011(1)_1789562840543.jpg";
+import recordsReference from "@assets/IMG-20260916-WA0010_1789562840516.jpg";
+import rankingReference from "@assets/IMG-20260916-WA0008(1)_1789562840567.jpg";
+
+type LuckyDrawModal = "ranking" | "records" | null;
 
 export default function CheckinPage() {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const [modal, setModal] = useState<LuckyDrawModal>(null);
 
-  const { data: bonusStatus } = useQuery<BonusStatus>({
-    queryKey: ["/api/daily-bonus-status"],
-    refetchInterval: 60000,
-  });
-
-  const claimMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/claim-daily-bonus", {});
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erreur");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/daily-bonus-status"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({ title: "Bonus reçu !", description: "50 FCFA ajoutés à votre solde" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
-    },
-  });
-
-  if (!user) return null;
-
-  const country = getCountryByCode(user.country);
-  const currency = country?.currency || "XOF";
-  const totalBonusClaimed = bonusStatus?.totalBonusClaimed || 0;
-  const canClaim = Boolean(bonusStatus?.canClaim);
-  const formatAmount = (amount: number) => `${Math.round(amount).toLocaleString("fr-FR")}${currency}`;
+  const showNoDrawsMessage = () => {
+    toast({
+      title: "Nombre de tirages restant : 0",
+      description: "Invitez un ami à vous inscrire pour recevoir un tour gratuit.",
+    });
+  };
 
   return (
-    <main className="checkin-reference min-h-full bg-[#f4f4f4] pb-20">
+    <main className="lucky-draw-page">
       <style>{`
-        .checkin-reference {
-          color: #171717;
-          font-family: Inter, Arial, sans-serif;
+        .lucky-draw-page {
+          min-height: 100dvh;
+          overflow-x: hidden;
+          background: #ff765f;
+          font-family: Arial, Helvetica, sans-serif;
         }
-        .checkin-reference .checkin-screen {
-          width: 100%;
-          max-width: 500px;
-          min-height: 100%;
+        .lucky-draw-page *,
+        .lucky-draw-page *::before,
+        .lucky-draw-page *::after {
+          box-sizing: border-box;
+        }
+        .lucky-draw-page .lucky-draw-screen,
+        .lucky-draw-page .lucky-draw-modal-art {
+          position: relative;
+          width: min(100%, 500px);
           margin: 0 auto;
-          overflow: hidden;
-          background: #f4f4f4;
-        }
-        .checkin-reference .hero {
-          position: relative;
-          height: min(61.4vw, 307px);
-          min-height: 245px;
-          overflow: hidden;
-          background: #77cdeb;
-        }
-        .checkin-reference .hero-art {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: min(49.9vw, 250px);
+          aspect-ratio: 720 / 1600;
           overflow: hidden;
         }
-        .checkin-reference .hero-art::after {
-          position: absolute;
-          z-index: 1;
-          inset: 0;
-          background: linear-gradient(180deg, rgba(34, 151, 219, .12), rgba(35, 112, 198, .2));
-          content: "";
-          pointer-events: none;
-        }
-        .checkin-reference .hero-art img {
-          position: relative;
-          z-index: 0;
+        .lucky-draw-page .lucky-draw-reference {
           display: block;
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center center;
+          object-position: center;
           pointer-events: none;
+          user-select: none;
         }
-        .checkin-reference .back {
-          position: absolute;
-          z-index: 3;
-          top: 12px;
-          left: 34px;
-          display: grid;
-          width: 68px;
-          height: 39px;
-          place-items: center;
-          border-radius: 22px;
-          background: #3776cf;
-          color: white;
-          box-shadow: 0 1px 2px rgba(0,0,0,.08);
-        }
-        .checkin-reference .back svg {
-          width: 23px;
-          height: 23px;
-          stroke-width: 4;
-        }
-        .checkin-reference .hero-title {
+        .lucky-draw-page .lucky-draw-target {
           position: absolute;
           z-index: 2;
-          top: 30px;
-          left: 0;
-          width: 100%;
-          color: white;
-          font-size: 25px;
-          font-weight: 400;
-          line-height: 1;
-          text-align: center;
-          text-shadow: 0 1px 2px rgba(0,0,0,.1);
+          display: block;
+          border: 0;
+          border-radius: 18px;
+          background: transparent;
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
         }
-        .checkin-reference .avatar {
-          position: absolute;
-          z-index: 3;
-          top: 73px;
-          left: 50%;
-          width: 126px;
-          height: 126px;
-          overflow: hidden;
-          border: 4px solid white;
+        .lucky-draw-page .lucky-draw-target:focus-visible,
+        .lucky-draw-page .lucky-draw-close:focus-visible {
+          outline: 3px solid #fff;
+          outline-offset: 2px;
+        }
+        .lucky-draw-page .lucky-draw-back {
+          top: 4.5%;
+          left: 1%;
+          width: 12%;
+          height: 8%;
+        }
+        .lucky-draw-page .lucky-draw-go {
+          top: 39%;
+          left: 30%;
+          width: 40%;
+          height: 19%;
           border-radius: 50%;
-          background-image: url("${tonLogo}");
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: cover;
-          background-color: white;
-          box-shadow: 0 2px 4px rgba(0,0,0,.12);
-          transform: translateX(-50%);
         }
-        .checkin-reference .earnings-card {
-          position: relative;
-          z-index: 4;
-          height: 298px;
-          margin: -28px 16px 0;
-          overflow: hidden;
-          border-radius: 20px;
-          background: white;
-          box-shadow: 0 1px 3px rgba(0,0,0,.01);
+        .lucky-draw-page .lucky-draw-ranking {
+          top: 75%;
+          left: 1%;
+          width: 24%;
+          height: 15%;
         }
-        .checkin-reference .earned-total {
-          padding-top: 9px;
-          color: #070707;
-          font-size: 29px;
-          font-weight: 800;
-          line-height: 1.1;
-          text-align: center;
+        .lucky-draw-page .lucky-draw-invite {
+          top: 75%;
+          left: 24%;
+          width: 52%;
+          height: 15%;
         }
-        .checkin-reference .earned-heading {
-          margin-top: 10px;
-          color: #424242;
-          font-size: 20px;
-          font-weight: 400;
-          line-height: 1;
-          text-align: center;
+        .lucky-draw-page .lucky-draw-records {
+          top: 75%;
+          right: 1%;
+          width: 24%;
+          height: 15%;
         }
-        .checkin-reference .stats {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          margin-top: 78px;
-        }
-        .checkin-reference .stat {
-          text-align: center;
-        }
-        .checkin-reference .stat-value {
-          color: #2574cf;
-          font-size: 35px;
-          font-weight: 800;
-          letter-spacing: -.8px;
-          line-height: 1;
-        }
-        .checkin-reference .stat-value span {
-          padding-left: 4px;
-          font-size: 23px;
-        }
-        .checkin-reference .stat-value.secondary {
-          font-size: 35px;
-          font-weight: 400;
-        }
-        .checkin-reference .stat-label {
-          margin-top: 15px;
-          color: #3471a1;
-          font-size: 13px;
-          font-weight: 500;
-          line-height: 1;
-        }
-        .checkin-reference .claim {
+        .lucky-draw-page .lucky-draw-modal {
+          position: fixed;
+          z-index: 60;
+          inset: 0;
           display: flex;
-          width: calc(100% - 96px);
-          height: 62px;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
-          margin: 14px 48px 0;
-          border-radius: 34px;
-          background: #3174d1;
-          color: white;
-          font-size: 26px;
-          font-weight: 400;
-          line-height: 1;
-          box-shadow: 0 2px 3px rgba(31,90,174,.16);
+          overflow-y: auto;
+          background: rgba(0, 0, 0, .28);
         }
-        .checkin-reference .claim:disabled {
-          background: #a4a4a4;
-          color: rgba(255,255,255,.9);
-          box-shadow: none;
+        .lucky-draw-page .lucky-draw-modal-art {
+          flex: 0 0 auto;
         }
-        .checkin-reference .claim svg {
-          width: 24px;
-          height: 24px;
+        .lucky-draw-page .lucky-draw-close {
+          position: absolute;
+          z-index: 2;
+          top: 71%;
+          left: 22%;
+          width: 56%;
+          height: 16%;
+          border: 0;
+          border-radius: 999px;
+          background: transparent;
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
         }
-        .checkin-reference .next-claim {
-          margin-top: 10px;
-          color: #777;
-          font-size: 12px;
-          text-align: center;
-        }
-        @media (max-width: 360px) {
-          .checkin-reference .back { left: 20px; }
-          .checkin-reference .hero-title { font-size: 22px; }
-          .checkin-reference .avatar { width: 112px; height: 112px; }
-          .checkin-reference .earnings-card { margin-right: 10px; margin-left: 10px; }
-          .checkin-reference .claim { width: calc(100% - 64px); margin-right: 32px; margin-left: 32px; }
-          .checkin-reference .stat-label { font-size: 11px; }
+        @media (min-width: 501px) {
+          .lucky-draw-page .lucky-draw-modal {
+            padding: 16px 0;
+          }
+          .lucky-draw-page .lucky-draw-modal-art {
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+          }
         }
       `}</style>
 
-      <div className="checkin-screen">
-        <section className="hero" aria-label="Check-in quotidien">
-          <div className="hero-art">
-            <img src={checkinHero} alt="" />
-          </div>
-          <button className="back" onClick={() => navigate("/")}>
-            <ChevronLeft aria-hidden="true" />
-          </button>
-          <h1 className="hero-title">Check-in</h1>
-          <div className="avatar" aria-hidden="true" />
-        </section>
-
-        <section className="earnings-card" aria-label="Revenus du check-in">
-          <p className="earned-total">{formatAmount(totalBonusClaimed)}</p>
-          <p className="earned-heading">Revenus cumulés</p>
-
-          <div className="stats">
-            <div className="stat">
-              <p className="stat-value">50<span>{currency}</span></p>
-              <p className="stat-label">Revenus du check-in quotidien</p>
-            </div>
-            <div className="stat">
-              <p className="stat-value secondary">{Math.round(totalBonusClaimed)}<span>{currency}</span></p>
-              <p className="stat-label">Revenus cumulés</p>
-            </div>
-          </div>
-        </section>
+      <div className="lucky-draw-screen">
+        <img
+          className="lucky-draw-reference"
+          src={luckyDrawReference}
+          alt="Route de la fortune, tirage chanceux"
+        />
 
         <button
-          className="claim"
-          onClick={() => claimMutation.mutate()}
-          disabled={!canClaim || claimMutation.isPending}
-          data-testid="button-pointer"
-        >
-          {claimMutation.isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : canClaim ? (
-            "Check-in"
-          ) : (
-            `${bonusStatus?.hoursRemaining || 0}h`
-          )}
-        </button>
-        {!canClaim && bonusStatus?.hoursRemaining ? (
-          <p className="next-claim">Prochain check-in dans {bonusStatus.hoursRemaining}h</p>
-        ) : null}
+          type="button"
+          className="lucky-draw-target lucky-draw-back"
+          aria-label="Retour à l'accueil"
+          onClick={() => navigate("/")}
+        />
+        <button
+          type="button"
+          className="lucky-draw-target lucky-draw-go"
+          aria-label="Lancer le tirage"
+          onClick={showNoDrawsMessage}
+        />
+        <button
+          type="button"
+          className="lucky-draw-target lucky-draw-ranking"
+          aria-label="Afficher le classement"
+          onClick={() => setModal("ranking")}
+        />
+        <button
+          type="button"
+          className="lucky-draw-target lucky-draw-invite"
+          aria-label="Inviter des amis"
+          onClick={() => navigate("/team")}
+        />
+        <button
+          type="button"
+          className="lucky-draw-target lucky-draw-records"
+          aria-label="Afficher les enregistrements"
+          onClick={() => setModal("records")}
+        />
       </div>
+
+      {modal ? (
+        <div className="lucky-draw-modal" role="dialog" aria-modal="true" aria-label={modal === "ranking" ? "Classement fictif" : "Enregistrements"}>
+          <div className="lucky-draw-modal-art">
+            <img
+              className="lucky-draw-reference"
+              src={modal === "ranking" ? rankingReference : recordsReference}
+              alt={modal === "ranking" ? "Classement fictif des participants" : "Aucun enregistrement"}
+            />
+            <button
+              type="button"
+              className="lucky-draw-close"
+              aria-label="Fermer"
+              onClick={() => setModal(null)}
+            />
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

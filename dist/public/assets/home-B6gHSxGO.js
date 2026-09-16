@@ -1,34 +1,4 @@
-import { useLocation } from "wouter";
-
-import homeDashboardHero from "@assets/home-dashboard-hero.jpg";
-import dashboardGift from "@assets/dashboard-gift.png";
-import telegramIcon from "@assets/tg-1_1787367952311.png";
-import whatsappIcon from "@assets/images_(26)_1787367952281.png";
-import facebookIcon from "@assets/images_(27)_1787367952249.png";
-import youtubeIcon from "@assets/youtube-square-logo-png_seeklogo-157924_1789555819761.png";
-
-const socialActions = [
-  { label: "Recharger", href: "/deposit", icon: telegramIcon },
-  { label: "Retrait", href: "/withdrawal", icon: whatsappIcon },
-  { label: "Aide", href: "/service", icon: facebookIcon },
-  { label: "Route de la fortune", href: "/checkin", icon: youtubeIcon },
-];
-
-const companyDescription =
-  "Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde. La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents. Grâce à ses solides capacités internes de recherche";
-
-export default function HomePage() {
-  const [, navigate] = useLocation();
-
-  const noticeText = "Nouveaux membres cliquez pour consulter";
-
-  const openGroup = () => {
-    navigate("/investment-info");
-  };
-
-  return (
-    <main className="dashboard-reference">
-      <style>{`
+import{u as n,j as e,t,w as d,f as s}from"./index-Dz-UucuN.js";const p="/assets/home-dashboard-hero-CHh101dX.jpg",l="/assets/dashboard-gift-CaES8bPD.png",c="/assets/youtube-square-logo-png_seeklogo-157924_1789555819761-CXE3Rocu.png",h=[{label:"Recharger",href:"/deposit",icon:t},{label:"Retrait",href:"/withdrawal",icon:d},{label:"Aide",href:"/service",icon:s},{label:"Route de la fortune",href:"/checkin",icon:c}],b="Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde. La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents. Grâce à ses solides capacités internes de recherche";function f(){const[,a]=n(),o="Nouveaux membres cliquez pour consulter",i=()=>{a("/investment-info")};return e.jsxs("main",{className:"dashboard-reference",children:[e.jsx("style",{children:`
         .dashboard-reference {
           min-height: 100dvh;
           overflow-x: hidden;
@@ -260,43 +230,4 @@ export default function HomePage() {
           .dashboard-reference .dashboard-gift { width: 116px; }
           .dashboard-reference .dashboard-profile { padding-right: 18px; padding-left: 18px; }
         }
-      `}</style>
-
-      <div className="dashboard-screen">
-        <img className="dashboard-hero" src={homeDashboardHero} alt="Zijin Mining" />
-
-        <button type="button" className="dashboard-notice" onClick={openGroup} aria-label="Consulter les nouveaux membres">
-          <span className="dashboard-notice-bubble" aria-hidden="true">•••</span>
-          <span className="dashboard-notice-text">{noticeText}</span>
-        </button>
-
-        <section className="dashboard-social-grid" aria-label="Actions principales">
-          {socialActions.map((action) => (
-            <button
-              key={action.label}
-              type="button"
-              className="dashboard-social-action"
-              onClick={() => navigate(action.href)}
-            >
-              <img className="dashboard-social-mark" src={action.icon} alt="" />
-              <span>{action.label}</span>
-            </button>
-          ))}
-        </section>
-
-        <button type="button" className="dashboard-share" onClick={() => navigate("/team")} aria-label="Inviter des amis">
-          <img className="dashboard-gift" src={dashboardGift} alt="" />
-          <span className="dashboard-share-label">Demandez à vos amis de<br />gagner de l'argent ensemble</span>
-        </button>
-
-        <section className="dashboard-profile" aria-labelledby="dashboard-profile-title">
-          <div className="dashboard-profile-header">
-            <h1 id="dashboard-profile-title" className="dashboard-profile-title">Profil de l'entreprise</h1>
-            <button type="button" className="dashboard-profile-more" onClick={() => navigate("/about")}>Lire plus</button>
-          </div>
-          <p className="dashboard-profile-copy">{companyDescription}</p>
-        </section>
-      </div>
-    </main>
-  );
-}
+      `}),e.jsxs("div",{className:"dashboard-screen",children:[e.jsx("img",{className:"dashboard-hero",src:p,alt:"Zijin Mining"}),e.jsxs("button",{type:"button",className:"dashboard-notice",onClick:i,"aria-label":"Consulter les nouveaux membres",children:[e.jsx("span",{className:"dashboard-notice-bubble","aria-hidden":"true",children:"•••"}),e.jsx("span",{className:"dashboard-notice-text",children:o})]}),e.jsx("section",{className:"dashboard-social-grid","aria-label":"Actions principales",children:h.map(r=>e.jsxs("button",{type:"button",className:"dashboard-social-action",onClick:()=>a(r.href),children:[e.jsx("img",{className:"dashboard-social-mark",src:r.icon,alt:""}),e.jsx("span",{children:r.label})]},r.label))}),e.jsxs("button",{type:"button",className:"dashboard-share",onClick:()=>a("/team"),"aria-label":"Inviter des amis",children:[e.jsx("img",{className:"dashboard-gift",src:l,alt:""}),e.jsxs("span",{className:"dashboard-share-label",children:["Demandez à vos amis de",e.jsx("br",{}),"gagner de l'argent ensemble"]})]}),e.jsxs("section",{className:"dashboard-profile","aria-labelledby":"dashboard-profile-title",children:[e.jsxs("div",{className:"dashboard-profile-header",children:[e.jsx("h1",{id:"dashboard-profile-title",className:"dashboard-profile-title",children:"Profil de l'entreprise"}),e.jsx("button",{type:"button",className:"dashboard-profile-more",onClick:()=>a("/about"),children:"Lire plus"})]}),e.jsx("p",{className:"dashboard-profile-copy",children:b})]})]})]})}export{f as default};
