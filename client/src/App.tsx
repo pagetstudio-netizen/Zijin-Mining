@@ -17,6 +17,7 @@ import DepositPage from "@/pages/deposit";
 import WithdrawalPage from "@/pages/withdrawal";
 import ServicePage from "@/pages/service";
 import AboutPage from "@/pages/about";
+import InvestmentInfoPage from "@/pages/investment-info";
 import MyProductsPage from "@/pages/my-products";
 import CheckinPage from "@/pages/checkin";
 
@@ -287,6 +288,11 @@ function Router() {
       <Route path="/about">
         <ProtectedRoute>
           <AboutPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/investment-info">
+        <ProtectedRoute>
+          <InvestmentInfoPage />
         </ProtectedRoute>
       </Route>
       <Route path="/rules">
