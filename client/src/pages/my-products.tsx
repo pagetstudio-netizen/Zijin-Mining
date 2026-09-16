@@ -154,7 +154,7 @@ export default function MyProductsPage() {
           border: 0;
           border-radius: 28px 10px 28px 10px;
           padding: 0 18px;
-          background: transparent;
+          background: #fff;
           color: #999;
           font-size: clamp(16px, 4.4vw, 21px);
           font-weight: 400;
@@ -162,6 +162,7 @@ export default function MyProductsPage() {
           transition: color .3s ease, box-shadow .3s ease;
         }
         .products-reference .category-tab.active {
+          background: transparent;
           color: white;
           font-weight: 700;
           box-shadow: none;
