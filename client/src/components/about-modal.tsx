@@ -13,30 +13,24 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
-              <img src={tonLogo} alt="Stone by ton" className="w-10 h-10 object-contain" />
+              <img src={tonLogo} alt="Zijin Mining" className="w-10 h-10 object-contain" />
             </div>
-            À propos de Stone by ton
+            À propos de Zijin Mining
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 text-sm text-muted-foreground">
           <p>
-            Stone by ton est une entreprise française fondée en 2013, spécialisée dans la vente en ligne et physique de pierre naturelle, de travertin, de carrelage et de parements muraux.
+            Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde.
           </p>
           <p>
-            Basée à Six-Fours-les-Plages dans le Var, la marque propose une large gamme de revêtements pour les sols et les murs intérieurs ou extérieurs.
+            La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents. Grâce à ses solides capacités internes de recherche, d'ingénierie et de développement, Zijin maintient une efficacité opérationnelle élevée et des coûts réduits, tant pour ses acquisitions que pour ses opérations.
           </p>
-          <div className="bg-secondary rounded-lg p-4 space-y-2">
-            <h4 className="font-medium text-foreground">Nos avantages :</h4>
-            <ul className="space-y-1">
-              <li>- Revenus quotidiens automatiques</li>
-              <li>- Produits robotiques de qualité</li>
-              <li>- Système de parrainage attractif</li>
-              <li>- Support client disponible</li>
-            </ul>
-          </div>
+          <p>
+            Ceci lui permet d'être un chef de file de l'industrie en matière de création de valeur, une performance qui repose sur sa philosophie de développement inclusif et se traduit par d'excellentes performances environnementales, sociales et de gouvernance.
+          </p>
           <p className="text-xs">
-            Version 1.0.0 - Tous droits réservés
+            Les actions de Zijin sont cotées à la Bourse de Hong Kong (HKEX: 2899) et à la Bourse de Shanghai (SSE: 601899).
           </p>
         </div>
       </DialogContent>

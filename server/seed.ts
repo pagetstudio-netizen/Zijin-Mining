@@ -197,7 +197,7 @@ export async function seed() {
     { key: "groupType", value: "telegram" },
     { key: "groupLabel", value: "Groupe de discussion" },
     { key: "popupButtonLabel", value: "Cliquez ici pour rejoindre le groupe Telegram" },
-    { key: "noticeText", value: "Bienvenue sur Stone by ton ! Découvrez nos pierres naturelles, travertins, carrelages et parements muraux." },
+    { key: "noticeText", value: "Bienvenue sur Zijin Mining ! Découvrez notre présence minière et métallurgique mondiale." },
     { key: "supportEnabled", value: "true" },
     { key: "support2Enabled", value: "true" },
     { key: "channelEnabled", value: "true" },
@@ -242,7 +242,7 @@ export async function seed() {
       console.log(`Setting added: ${settingData.key}${isSensitive ? "" : ` = ${settingData.value}`}`);
     } else if (
       settingData.key === "noticeText" &&
-      /sybotx|disney|walt|pixar|marvel|star wars/i.test(existing.value)
+      /stone by ton|sybotx|disney|walt|pixar|marvel|star wars/i.test(existing.value)
     ) {
       await db.update(platformSettings)
         .set({ value: settingData.value })

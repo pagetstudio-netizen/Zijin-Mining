@@ -84,7 +84,7 @@ export default function TasksPage() {
       <div className="relative overflow-hidden" style={{ height: "260px" }}>
         <img
           src={jollibeeImg}
-          alt="Stone by ton"
+          alt="Zijin Mining"
           className="w-full h-full object-cover object-center"
         />
         {/* Dark gradient overlay */}
@@ -105,8 +105,8 @@ export default function TasksPage() {
           </Link>
           <div className="flex-1 flex justify-center">
             <div className="flex items-center gap-2">
-              <img src={tonLogo} alt="Stone by ton" className="h-8 w-8 rounded-md object-contain" />
-              <span className="text-white text-sm font-bold">Stone by ton</span>
+              <img src={tonLogo} alt="Zijin Mining" className="h-8 w-8 rounded-md object-contain" />
+              <span className="text-white text-sm font-bold">Zijin Mining</span>
             </div>
           </div>
           <div className="w-9" />

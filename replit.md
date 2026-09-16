@@ -1,8 +1,8 @@
-# Stone by ton - Online Stone & Tile Platform
+# Zijin Mining - Mining & Metallurgical Platform
 
 ## Overview
 
-Stone by ton is a French company founded in 2013, based in Six-Fours-les-Plages in the Var. The platform presents a range of natural stone, travertine, tiles, and wall cladding for indoor and outdoor floors and walls.
+Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde. La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents.
 
 ## User Preferences
 

@@ -83,8 +83,8 @@ export default function InvestPage() {
         style={{ background: "linear-gradient(135deg, #FF4500 0%, #E03E00 100%)" }}
       >
           <div className="flex items-center gap-2">
-            <img src={tonLogo} alt="Stone by ton" className="h-8 w-8 rounded-md object-contain" />
-            <span className="text-white text-sm font-bold">Stone by ton</span>
+            <img src={tonLogo} alt="Zijin Mining" className="h-8 w-8 rounded-md object-contain" />
+            <span className="text-white text-sm font-bold">Zijin Mining</span>
           </div>
         <button
           onClick={() => navigate("/service")}

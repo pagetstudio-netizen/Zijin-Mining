@@ -43,7 +43,7 @@ export default function HomePage() {
   const currency = country?.currency || "XOF";
   const balance = Number.parseFloat(user.balance || "0");
   const totalEarnings = Number.parseFloat(user.totalEarnings || "0");
-  const noticeText = settings?.noticeText || "Bienvenue sur Stone by ton !";
+  const noticeText = settings?.noticeText || "Bienvenue sur Zijin Mining !";
   const groupLink = settings?.groupLink || "";
   const formatMoney = (amount: number) => `${Math.round(amount).toLocaleString("fr-FR")}${currency}`;
 

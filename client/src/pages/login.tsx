@@ -117,7 +117,7 @@ export default function LoginPage() {
 
       <div className="auth-screen">
         <section className="auth-panel">
-          <h1 className="auth-brand">Stone by ton</h1>
+          <h1 className="auth-brand">Zijin Mining</h1>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <input type="hidden" {...form.register("country")} />
 

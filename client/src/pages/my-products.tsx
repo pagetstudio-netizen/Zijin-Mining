@@ -217,7 +217,7 @@ export default function MyProductsPage() {
               ) : allUserProducts.length === 0 ? (
                 <div className="empty">
                   <img src={emptyIllustration} alt="Vide" />
-                  <p>Aucun produit Stone by ton</p>
+                   <p>Aucun produit Zijin Mining</p>
                   <p className="text-sm text-gray-400">Achetez des produits pour commencer à gagner</p>
                 </div>
               ) : (

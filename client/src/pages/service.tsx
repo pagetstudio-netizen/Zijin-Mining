@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 
 import serviceImage from "@assets/images_(59)_1787364932839.jpeg";
-import stoneTonLogo from "@assets/logo-ton_1787364932867.png";
+import brandLogo from "@assets/logo-ton_1787364932867.png";
 import tonMachinesBanner from "@assets/images_(70)_1787365314673.jpeg";
 
 interface LinksSettings {
@@ -71,7 +71,7 @@ export default function ServicePage() {
               <ChevronLeft aria-hidden="true" />
             </button>
           </Link>
-          <img className="service-logo" src={stoneTonLogo} alt="Stone by ton" />
+          <img className="service-logo" src={brandLogo} alt="Zijin Mining" />
           <h1 className="service-title">Service client</h1>
         </header>
 
@@ -82,7 +82,7 @@ export default function ServicePage() {
         <section className="telegram-section" aria-labelledby="telegram-heading">
           <h2 id="telegram-heading" className="telegram-title">Telegram</h2>
           <div className="telegram-grid">
-            <img className="bike-image" src={serviceImage} alt="Terminaux Stone by ton" />
+            <img className="bike-image" src={serviceImage} alt="Infrastructures Zijin Mining" />
             <div className="telegram-actions">
               {telegramLinks.map((link) => (
                 <button key={link.testId} type="button" className={`telegram-link ${link.size}`} onClick={() => window.open(link.href, "_blank")} data-testid={link.testId}>

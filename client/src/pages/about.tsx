@@ -19,19 +19,19 @@ export default function AboutPage() {
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5" style={{ color: "#d4d4d4", fontSize: 13.5, lineHeight: "1.75" }}>
 
         <p>
-          Stone by ton est une entreprise française fondée en 2013, spécialisée dans la vente en ligne et physique de pierre naturelle, de travertin, de carrelage et de parements muraux. Basée à Six-Fours-les-Plages dans le Var, la marque propose une large gamme de revêtements pour les sols et les murs intérieurs ou extérieurs.
+          Zijin Mining est une entreprise minière et métallurgique de premier plan à l'échelle mondiale et l'un des plus grands producteurs d'or, de cuivre et de zinc au monde. La société exploite plus de 30 projets et exploitations minières de grande envergure dans 19 pays sur 5 continents.
         </p>
 
         <p>
-          Stone by ton accompagne les particuliers et les professionnels dans leurs projets d’aménagement, avec des matériaux sélectionnés pour leur qualité, leur caractère et leur durabilité.
+          Grâce à ses solides capacités internes de recherche, d'ingénierie et de développement, Zijin maintient une efficacité opérationnelle élevée et des coûts réduits, tant pour ses acquisitions que pour ses opérations.
         </p>
 
         <p>
-          Notre collection s’adapte aux espaces intérieurs comme extérieurs : sols, murs, terrasses, salles de bains et pièces de vie.
+          Ceci lui permet d'être un chef de file de l'industrie en matière de création de valeur, une performance qui repose sur sa philosophie de développement inclusif.
         </p>
 
         <p>
-          La qualité des produits, le conseil et la satisfaction des clients sont au cœur de l’engagement de Stone by ton.
+          Cette philosophie se traduit par d'excellentes performances environnementales, sociales et de gouvernance. Les actions de Zijin sont cotées à la Bourse de Hong Kong (HKEX: 2899) et à la Bourse de Shanghai (SSE: 601899).
         </p>
 
       </div>

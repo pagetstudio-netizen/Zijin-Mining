@@ -129,7 +129,7 @@ export default function TeamPage() {
       <div className="team-screen">
           <h1 className="team-title">
             <span>Équipe</span>
-            <img src={teamLogo} alt="Stone by ton" />
+            <img src={teamLogo} alt="Zijin Mining" />
           </h1>
 
         <section className="invite-card" aria-label="Invitation">
