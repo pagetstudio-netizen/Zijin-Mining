@@ -63,6 +63,7 @@ import {
 import express from "express";
 
 const FORTUNE_REWARDS = [5, 10, 30, 100, 300, 1000, 2000, 5000];
+const MAX_FORTUNE_REWARD = 500;
 
 // --- Brute-force protection (in-memory) ---
 const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
@@ -166,6 +167,7 @@ async function creditApprovedDeposit(deposit: { id: number; userId: number; amou
     description: `Dépôt RobotPay #${deposit.id}`,
   });
   await storage.processDepositReferralCommissions(user.id, deposit.amount);
+  await storage.grantReferralFortuneSpinIfQualified(user.id);
   void sendTelegramMessage(
     [
       "✅ <b>Dépôt validé</b>",
@@ -350,13 +352,6 @@ export async function registerRoutes(
         referredBy,
       });
 
-      if (referredBy) {
-        const referrer = await storage.getUserByReferralCode(referredBy);
-        if (referrer) {
-          await storage.createFortuneSpin(referrer.id);
-        }
-      }
-
       req.session.userId = user.id;
       res.json({ user: { ...user, password: undefined } });
     } catch (error: any) {
@@ -439,16 +434,30 @@ export async function registerRoutes(
   app.get("/api/fortune/status", requireAuth, async (req, res) => {
     try {
       const remainingSpins = await storage.getAvailableFortuneSpinCount(req.session.userId!);
+      res.set("Cache-Control", "no-store");
       res.json({ remainingSpins });
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Impossible de charger les tours restants" });
     }
   });
 
+  app.get("/api/fortune/records", requireAuth, async (req, res) => {
+    try {
+      const records = await storage.getFortuneSpinRecords(req.session.userId!);
+      res.set("Cache-Control", "no-store");
+      res.json(records);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Impossible de charger l'historique des gains" });
+    }
+  });
+
   app.post("/api/fortune/spin", requireAuth, async (req, res) => {
     try {
       const userId = req.session.userId!;
-      const reward = FORTUNE_REWARDS[Math.floor(Math.random() * FORTUNE_REWARDS.length)];
+      const reward = Math.min(
+        MAX_FORTUNE_REWARD,
+        FORTUNE_REWARDS[Math.floor(Math.random() * FORTUNE_REWARDS.length)],
+      );
       const spin = await storage.claimFortuneSpin(userId, reward);
 
       if (!spin) {
@@ -2354,6 +2363,7 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
           description: "Dépôt validé",
         });
         await storage.processDepositReferralCommissions(deposit.userId, deposit.amount);
+        await storage.grantReferralFortuneSpinIfQualified(deposit.userId);
       }
 
       await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé: ${deposit.amount}F`);
@@ -2620,6 +2630,23 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
         case "assign-product":
           await storage.purchaseProduct(userId, value, true);
           await storage.logAdminAction(req.session.userId!, "assign_product", userId, `Produit ${value} attribué`);
+          break;
+        case "grant-fortune":
+          const spinCount = Number(value);
+          if (!Number.isInteger(spinCount) || spinCount < 1 || spinCount > 1000) {
+            return res.status(400).json({ message: "Le nombre de tours doit être compris entre 1 et 1000" });
+          }
+          const targetUser = await storage.getUser(userId);
+          if (!targetUser) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+          }
+          await storage.grantFortuneSpins(userId, spinCount);
+          await storage.logAdminAction(
+            req.session.userId!,
+            "grant_fortune",
+            userId,
+            `${spinCount} tour(s) de roue attribué(s)`,
+          );
           break;
         case "revoke-product":
           await storage.removeUserProduct(userId, value);

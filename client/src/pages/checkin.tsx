@@ -9,6 +9,12 @@ import { Loader2 } from "lucide-react";
 type FortuneModal = "ranking" | "records" | null;
 type FortuneStatus = { remainingSpins: number };
 type FortuneSpinResult = { reward: number; remainingSpins: number };
+type FortuneRecord = {
+  id: number;
+  reward: number | null;
+  createdAt: string;
+  usedAt: string | null;
+};
 
 const wheelValues = ["5", "10", "30", "100", "300", "1000", "2000", "5000"];
 
@@ -31,6 +37,11 @@ export default function CheckinPage() {
     queryKey: ["/api/fortune/status"],
   });
 
+  const { data: fortuneRecords = [], isLoading: loadingFortuneRecords } = useQuery<FortuneRecord[]>({
+    queryKey: ["/api/fortune/records"],
+    enabled: modal === "records",
+  });
+
   const remainingSpins = fortuneStatus?.remainingSpins ?? 0;
 
   const spinMutation = useMutation<FortuneSpinResult, Error, void>({
@@ -47,6 +58,7 @@ export default function CheckinPage() {
       queryClient.setQueryData(["/api/fortune/status"], {
         remainingSpins: data.remainingSpins,
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/fortune/records"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Félicitations !",
@@ -586,6 +598,27 @@ export default function CheckinPage() {
         .fortune-page .fortune-empty {
           min-height: 220px;
         }
+        .fortune-page .fortune-records {
+          min-height: 220px;
+        }
+        .fortune-page .fortune-record-row {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          min-height: 54px;
+          align-items: center;
+          border-bottom: 1px solid #f1dfe2;
+          color: #271b1a;
+          font-size: 15px;
+        }
+        .fortune-page .fortune-record-date {
+          color: #8e6b65;
+          font-size: 13px;
+        }
+        .fortune-page .fortune-record-amount {
+          color: #b52b1d;
+          font-weight: 800;
+          text-align: right;
+        }
         .fortune-page .fortune-empty-header {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -745,15 +778,24 @@ export default function CheckinPage() {
             Notre programme de parrainage est désormais disponible !
           </p>
           <p>
-            Pour chaque utilisateur qui s&apos;inscrit via votre lien, vous recevez un tour
-            de roulette gratuit avec 100 % de chance de gagner. Vous pourrez retirer
-            jusqu&apos;à <strong>5 000 francs CFA</strong> immédiatement.
+            Pour jouer à la roue, vous devez acheter un produit d&apos;investissement stable et payant.
+            Cet achat vous donne un tour de roulette gratuit avec 100 % de chance de gagner.
+            Vous pourrez retirer jusqu&apos;à <strong>5 000 francs CFA</strong> immédiatement.
           </p>
           <p>
-            De plus, vous recevez 20 % de leur investissement en commission. Par exemple,
+            Si un utilisateur inscrit via votre lien effectue un dépôt approuvé et achète
+            un produit d&apos;investissement stable et payant, vous recevez un tour de roulette gratuit
+            supplémentaire.
+          </p>
+          <p>
+            De plus, vous recevez 25 % de leur investissement en commission. Par exemple,
             s&apos;ils investissent <strong>100 000 francs CFA</strong>, vous recevez
-            <strong>20 000 francs CFA</strong> de commission. Les commissions sont
+            <strong>25 000 francs CFA</strong> de commission. Les commissions sont
             retirables instantanément.
+          </p>
+          <p>
+            Les montants affichés sur la roue restent inchangés, mais le gain réellement
+            crédité par tirage ne peut jamais dépasser <strong>500 francs CFA</strong>.
           </p>
         </section>
 
@@ -799,11 +841,38 @@ export default function CheckinPage() {
                   ))}
                 </>
               ) : (
-                <div className="fortune-empty">
+                <div className="fortune-records">
                   <div className="fortune-empty-header">
                     <span>Temps</span>
                     <span>Tirer un bonus</span>
                   </div>
+                  {loadingFortuneRecords ? (
+                    <div className="flex min-h-[180px] items-center justify-center">
+                      <Loader2 className="h-7 w-7 animate-spin text-[#bd3a1e]" aria-label="Chargement" />
+                    </div>
+                  ) : fortuneRecords.length > 0 ? (
+                    fortuneRecords.map((record) => (
+                      <div className="fortune-record-row" key={record.id}>
+                        <span className="fortune-record-date">
+                          {record.usedAt
+                            ? new Date(record.usedAt).toLocaleString("fr-FR", {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "—"}
+                        </span>
+                        <span className="fortune-record-amount">
+                          {record.reward === null
+                            ? "—"
+                            : `${record.reward.toLocaleString("fr-FR")} FCFA`}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex min-h-[180px] items-center justify-center px-4 text-center text-sm text-[#8e6b65]">
+                      Aucun gain reçu pour le moment.
+                    </div>
+                  )}
                 </div>
               )}
             </div>

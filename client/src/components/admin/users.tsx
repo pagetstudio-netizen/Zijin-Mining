@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/countries";
-import { Search, Edit, Ban, Shield, Lock, Unlock, Star, Users, Loader2, UserPlus, ChevronDown, ChevronUp, Trash2, ChevronLeft, ChevronRight, Landmark } from "lucide-react";
+import { Search, Edit, Ban, Shield, Lock, Unlock, Star, Users, Loader2, UserPlus, ChevronDown, ChevronUp, Trash2, ChevronLeft, ChevronRight, Landmark, Gift } from "lucide-react";
 import type { User, Product } from "@shared/schema";
 import { ADMIN_PATH } from "@/lib/admin-path";
 
@@ -124,6 +124,7 @@ export default function AdminUsers({ isSuperAdmin }: AdminUsersProps) {
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [teamUserId, setTeamUserId] = useState<number | null>(null);
   const [adminPinInput, setAdminPinInput] = useState("");
+  const [fortuneSpinsCount, setFortuneSpinsCount] = useState("1");
 
   // Debounce search input
   const debounceTimeout = useRef<ReturnType<typeof setTimeout>>();
@@ -511,6 +512,37 @@ export default function AdminUsers({ isSuperAdmin }: AdminUsersProps) {
                       {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "OK"}
                     </Button>
                   </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Donner des tours gratuits</label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      step="1"
+                      value={fortuneSpinsCount}
+                      onChange={(e) => setFortuneSpinsCount(e.target.value)}
+                      placeholder="Nombre de tours"
+                      data-testid="input-fortune-spins-count"
+                    />
+                    <Button
+                      onClick={() => updateMutation.mutate({
+                        userId: selectedUser.id,
+                        action: "grant-fortune",
+                        value: parseInt(fortuneSpinsCount, 10),
+                      })}
+                      disabled={updateMutation.isPending || !fortuneSpinsCount || parseInt(fortuneSpinsCount, 10) < 1}
+                      data-testid="button-grant-fortune-spins"
+                    >
+                      {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4 mr-1" />}
+                      Donner
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Les gains de la roue restent plafonnés à 500 FCFA par tirage.
+                  </p>
                 </div>
 
                 <div>

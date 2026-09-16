@@ -9,3 +9,5 @@
 - [InPay callback classification](inpay-callbacks.md) — InPay payin and payout callbacks can both include order_number; classify using the merchant reference prefix first.
 - [InPay IP whitelist](inpay-ip-whitelist.md) — InPay rejects API calls with errno 5 until the server's public egress IP is whitelisted.
 - [AshtechPay Burkina flow](ashtechpay-burkina.md) — BF uses exact operator names and requires the returned reference on OTP retries.
+- [Drizzle schema push limitation](drizzle-schema-push.md) — Non-interactive pushes can stop on existing schema-name conflicts; use safe dev DDL and let publish apply schema diffs.
+- [Fortune wheel eligibility](fortune-wheel-rules.md) — Paid investment purchase grants one spin; a referrer qualifies only after the referred user deposits and buys; admin grants are manual.

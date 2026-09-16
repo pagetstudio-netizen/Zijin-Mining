@@ -7,7 +7,7 @@ import {
   type GiftCode, type GiftCodeClaim, type Country
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, gte, lte, or, isNull } from "drizzle-orm";
+ import { eq, and, desc, sql, gte, lte, or, isNull, isNotNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 export interface IStorage {
@@ -84,8 +84,11 @@ export interface IStorage {
   getTeamStatsSimple(userId: number): Promise<{ level1Count: number; level2Count: number; level3Count: number; totalCommission: number }>;
 
   // Fortune wheel
-  createFortuneSpin(userId: number): Promise<FortuneSpin>;
+  grantFortuneSpin(userId: number, grantType?: string, grantKey?: string): Promise<FortuneSpin | undefined>;
+  grantFortuneSpins(userId: number, count: number): Promise<FortuneSpin[]>;
+  grantReferralFortuneSpinIfQualified(userId: number): Promise<FortuneSpin | undefined>;
   getAvailableFortuneSpinCount(userId: number): Promise<number>;
+  getFortuneSpinRecords(userId: number): Promise<FortuneSpin[]>;
   claimFortuneSpin(userId: number, reward: number): Promise<FortuneSpin | undefined>;
   
   // Tasks
@@ -324,6 +327,10 @@ export class DatabaseStorage implements IStorage {
       if (isFirstInvestment) {
         await this.processReferralCommissions(userId, product.price, productId);
       }
+
+      if (isFirstInvestment && !assignedByAdmin) {
+        await this.grantFortuneSpin(userId, "investment_purchase", `investment_purchase:${userId}`);
+      }
     } else {
       await this.updateUser(userId, { hasActiveProduct: true });
     }
@@ -337,7 +344,68 @@ export class DatabaseStorage implements IStorage {
       lastEarningDate: new Date(),
     }).returning();
 
+    if (!assignedByAdmin) {
+      await this.grantReferralFortuneSpinIfQualified(userId);
+    }
+
     return userProduct;
+  }
+
+  async grantFortuneSpin(userId: number, grantType = "manual", grantKey?: string): Promise<FortuneSpin | undefined> {
+    if (grantKey) {
+      const [existing] = await db.select()
+        .from(fortuneSpins)
+        .where(eq(fortuneSpins.grantKey, grantKey))
+        .limit(1);
+      if (existing) return existing;
+    }
+
+    const [spin] = await db.insert(fortuneSpins).values({
+      userId,
+      grantType,
+      grantKey: grantKey || null,
+    }).returning();
+    return spin;
+  }
+
+  async grantFortuneSpins(userId: number, count: number): Promise<FortuneSpin[]> {
+    const safeCount = Math.max(0, Math.floor(count));
+    if (safeCount === 0) return [];
+
+    return await db.insert(fortuneSpins)
+      .values(Array.from({ length: safeCount }, () => ({ userId, grantType: "manual" })))
+      .returning();
+  }
+
+  async grantReferralFortuneSpinIfQualified(userId: number): Promise<FortuneSpin | undefined> {
+    const user = await this.getUser(userId);
+    if (!user?.referredBy) return undefined;
+
+    const [approvedDeposit] = await db.select({ id: deposits.id })
+      .from(deposits)
+      .where(and(eq(deposits.userId, userId), eq(deposits.status, "approved")))
+      .limit(1);
+    if (!approvedDeposit) return undefined;
+
+    const [paidProduct] = await db.select({ id: userProducts.id })
+      .from(userProducts)
+      .innerJoin(products, eq(userProducts.productId, products.id))
+      .where(and(
+        eq(userProducts.userId, userId),
+        eq(products.isFree, false),
+        eq(userProducts.assignedByAdmin, false),
+      ))
+      .limit(1);
+    if (!paidProduct) return undefined;
+
+    const referrer = await this.getUserByReferralCode(user.referredBy);
+    if (!referrer) return undefined;
+
+    return this.grantFortuneSpin(
+      referrer.id,
+      "referral_qualification",
+      `referral_qualification:${userId}`,
+    );
   }
 
   async updateUserProduct(id: number, data: Partial<UserProduct>): Promise<UserProduct> {
@@ -851,16 +919,21 @@ export class DatabaseStorage implements IStorage {
     return parseFloat(result[0]?.total || "0");
   }
 
-  async createFortuneSpin(userId: number): Promise<FortuneSpin> {
-    const [spin] = await db.insert(fortuneSpins).values({ userId }).returning();
-    return spin;
-  }
-
   async getAvailableFortuneSpinCount(userId: number): Promise<number> {
     const result = await db.select({ count: sql<number>`count(*)` })
       .from(fortuneSpins)
       .where(and(eq(fortuneSpins.userId, userId), isNull(fortuneSpins.usedAt)));
     return Number(result[0]?.count || 0);
+  }
+
+  async getFortuneSpinRecords(userId: number): Promise<FortuneSpin[]> {
+    return await db.select()
+      .from(fortuneSpins)
+      .where(and(
+        eq(fortuneSpins.userId, userId),
+        isNotNull(fortuneSpins.usedAt),
+      ))
+      .orderBy(desc(fortuneSpins.usedAt));
   }
 
   async claimFortuneSpin(userId: number, reward: number): Promise<FortuneSpin | undefined> {

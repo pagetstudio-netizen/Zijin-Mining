@@ -234,6 +234,8 @@ export const fortuneSpins = pgTable("fortune_spins", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   reward: integer("reward"),
+  grantType: text("grant_type").notNull().default("manual"),
+  grantKey: text("grant_key").unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   usedAt: timestamp("used_at"),
 });
