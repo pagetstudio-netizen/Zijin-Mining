@@ -229,11 +229,11 @@ export default function MyProductsPage() {
           grid-row: 2;
           display: flex;
           width: 100%;
-          height: 66px;
+          height: 58px;
           min-width: 0;
           align-items: center;
           justify-content: space-between;
-          margin-top: 18px;
+          margin-top: 16px;
           border: 2px solid #303030;
           border-radius: 9px;
           padding-left: 9px;
@@ -250,7 +250,7 @@ export default function MyProductsPage() {
         }
         .products-reference .buy-button {
           display: flex;
-          flex: 0 0 153px;
+          flex: 0 0 128px;
           height: 100%;
           align-items: center;
           justify-content: center;
@@ -258,7 +258,7 @@ export default function MyProductsPage() {
           border-radius: 9px;
           background: linear-gradient(105deg, #e02b29 0%, #b82b38 45%, #1a478d 100%);
           color: white;
-          font-size: clamp(19px, 5vw, 25px);
+          font-size: clamp(17px, 4.2vw, 21px);
           font-weight: 700;
           line-height: 1;
         }
@@ -378,12 +378,12 @@ export default function MyProductsPage() {
             gap: 5px;
           }
           .products-reference .purchase-row {
-            height: 56px;
-            margin-top: 14px;
+            height: 52px;
+            margin-top: 13px;
           }
           .products-reference .buy-button {
-            flex-basis: 125px;
-            font-size: 18px;
+            flex-basis: 112px;
+            font-size: 16px;
           }
         }
       `}</style>
