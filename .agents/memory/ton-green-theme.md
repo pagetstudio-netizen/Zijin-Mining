@@ -7,4 +7,4 @@ Use Zijin Mining’s gold, red, black, and white palette as the primary visual l
 
 **Why:** The user supplied the Zijin Mining logo and corporate images, requested that the site no longer be green, and explicitly preserved the payment page.
 
-**How to apply:** Use the Zijin theme tokens for new or restyled site pages. Exclude `/robotpay` from the theme scope. Do not replace product imagery until the user supplies the product images.
+**How to apply:** Use the Zijin theme tokens for new or restyled site pages. Exclude `/robotpay` from the theme scope. Use the user-supplied Zijin product images for product cards when available.

@@ -8,14 +8,16 @@ import { Loader2 } from "lucide-react";
 import type { Product } from "@shared/schema";
 
 import emptyIllustration from "@assets/illustration-8_1784762965573.png";
-import productsReference from "@assets/20260822_123747_1787403034334.jpg";
-import productImage1 from "@assets/images_(67)_1787404892163.jpeg";
-import productImage2 from "@assets/maquininha-ton-e-boa_(1)_1787404928174.webp";
-import productImage3 from "@assets/images_(59)_1787404956774.jpeg";
-import productImage4 from "@assets/images_(58)_1787404956874.jpeg";
-import productImage5 from "@assets/images_(69)_1787404956897.jpeg";
-import productImage6 from "@assets/images_(67)_1787404956922.jpeg";
-import productImage7 from "@assets/images_(68)_1787404956953.jpeg";
+import productsReference from "@assets/images_(96)_1789547089397.jpeg";
+import productImage1 from "@assets/images_(96)_1789547089397.jpeg";
+import productImage2 from "@assets/images_(95)_1789547089720.jpeg";
+import productImage3 from "@assets/images_(94)_1789547089754.jpeg";
+import productImage4 from "@assets/images_(93)_1789547089817.jpeg";
+import productImage5 from "@assets/images_(92)_1789547089791.jpeg";
+import productImage6 from "@assets/images_(91)_1789547089864.jpeg";
+import productImage7 from "@assets/images_(90)_1789547089842.jpeg";
+import productImage8 from "@assets/images_(89)_1789547089908.jpeg";
+import productImage9 from "@assets/images_(88)_1789547089886.jpeg";
 
 const PRODUCT_IMAGES = [
   productImage1,
@@ -25,6 +27,8 @@ const PRODUCT_IMAGES = [
   productImage5,
   productImage6,
   productImage7,
+  productImage8,
+  productImage9,
 ];
 
 interface ProductWithOwnership extends Product {
@@ -107,13 +111,13 @@ export default function MyProductsPage() {
   };
 
   return (
-    <main className="products-reference min-h-full bg-[#f1fff4] pb-24">
+    <main className="products-reference min-h-full bg-[#fbf7eb] pb-24">
       <style>{`
         .products-reference { color: #151515; font-family: Inter, Arial, sans-serif; }
         .products-reference .products-screen { width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; }
-         .products-reference .products-hero { position: relative; height: min(70.31vw, 360px); min-height: 270px; overflow: hidden; background: #3fcb2d; }
+         .products-reference .products-hero { position: relative; height: min(70.31vw, 360px); min-height: 270px; overflow: hidden; background: #d9a600; }
          .products-reference .products-hero img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; pointer-events: none; }
-         .products-reference .stat-panel { position: absolute; top: 58%; z-index: 1; display: flex; height: 38%; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 24px; background: #4bcf37; color: #fff; text-align: center; pointer-events: none; }
+         .products-reference .stat-panel { position: absolute; top: 58%; z-index: 1; display: flex; height: 38%; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 24px; background: #b68100; color: #fff; text-align: center; pointer-events: none; }
          .products-reference .stat-panel.our { left: 4%; width: 45%; }
          .products-reference .stat-panel.my { right: 4%; width: 45%; }
          .products-reference .stat-value { display: block; max-width: 100%; overflow: hidden; padding: 0 8px; font-size: clamp(20px, 5vw, 30px); font-weight: 500; line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
@@ -123,14 +127,14 @@ export default function MyProductsPage() {
          .products-reference .stat-toggle.my { right: 4%; width: 45%; }
          .products-reference .product-list { padding: 0 12px 20px; background: white; }
          .products-reference .product-card { position: relative; height: 265px; margin-bottom: 0; overflow: hidden; border: 0; border-bottom: 1px solid #eeeeee; border-radius: 0; background: white; box-shadow: none; }
-         .products-reference .product-picture { position: absolute; top: 12px; right: 7px; left: auto; width: 154px; height: 154px; overflow: hidden; border: 2px solid #7fc9a2; border-radius: 11px; background: #fff; }
+          .products-reference .product-picture { position: absolute; top: 12px; right: 7px; left: auto; width: 154px; height: 154px; overflow: hidden; border: 2px solid #eadfbf; border-radius: 11px; background: #fff; }
          .products-reference .product-picture img { width: 100%; height: 100%; object-fit: cover; }
          .products-reference .product-details { position: absolute; top: 17px; left: 31px; right: 181px; overflow: hidden; }
-         .products-reference .product-name { overflow: hidden; color: #42bd45; font-size: 23px; font-weight: 500; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+          .products-reference .product-name { overflow: hidden; color: #b68100; font-size: 23px; font-weight: 600; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
          .products-reference .product-price { margin-top: 22px; color: #171717; font-size: 17px; font-weight: 400; }
          .products-reference .product-line { margin-top: 12px; color: #171717; font-size: 16px; line-height: 1.15; white-space: normal; overflow-wrap: anywhere; }
          .products-reference .product-line strong { margin-left: 8px; color: #171717; font-weight: 400; }
-         .products-reference .buy { position: absolute; right: 7px; bottom: 25px; display: grid; width: 154px; height: 61px; place-items: center; border-radius: 14px; background: linear-gradient(180deg, #43d338 0%, #19b948 100%); color: white; font-size: 18px; font-weight: 400; line-height: 1.1; text-align: center; }
+          .products-reference .buy { position: absolute; right: 7px; bottom: 25px; display: grid; width: 154px; height: 61px; place-items: center; border-radius: 14px; background: linear-gradient(180deg, #d9a600 0%, #b68100 100%); color: white; font-size: 18px; font-weight: 400; line-height: 1.1; text-align: center; }
          .products-reference .my-card { height: 265px; padding-bottom: 0; }
          .products-reference .my-card .product-details { position: absolute; top: 17px; left: 31px; right: 181px; margin-left: 0; padding-top: 0; padding-right: 0; }
          .products-reference .my-card .product-picture { top: 12px; }
