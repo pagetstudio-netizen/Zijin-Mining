@@ -364,7 +364,7 @@ export default function MyProductsPage() {
             right: 11px;
             bottom: -23px;
             left: 11px;
-            gap: 6px;
+            --category-gap: 6px;
           }
           .products-reference .category-tab {
             height: 50px;
@@ -407,7 +407,11 @@ export default function MyProductsPage() {
       <div className="products-screen">
         <section className="products-hero" aria-label="Produits Zijin Mining">
           <img src={productsReference} alt="Zijin Mining" />
-          <div className="category-tabs" role="tablist" aria-label="Catégories de produits">
+          <div
+            className={`category-tabs ${activeCategory === "activity" ? "activity-active" : "stable-active"}`}
+            role="tablist"
+            aria-label="Catégories de produits"
+          >
             <button
               type="button"
               role="tab"
