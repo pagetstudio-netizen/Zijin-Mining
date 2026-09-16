@@ -2,8 +2,13 @@ import { useState } from "react";
 import { ArrowLeft, BarChart3, FileText, Gift, HelpCircle, Share2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { Loader2 } from "lucide-react";
 
 type FortuneModal = "ranking" | "records" | null;
+type FortuneStatus = { remainingSpins: number };
+type FortuneSpinResult = { reward: number; remainingSpins: number };
 
 const wheelValues = ["5", "10", "30", "100", "300", "1000", "2000", "5000"];
 
@@ -19,12 +24,62 @@ export default function CheckinPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [modal, setModal] = useState<FortuneModal>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [lastReward, setLastReward] = useState<number | null>(null);
+
+  const { data: fortuneStatus, isLoading: loadingFortuneStatus } = useQuery<FortuneStatus>({
+    queryKey: ["/api/fortune/status"],
+  });
+
+  const remainingSpins = fortuneStatus?.remainingSpins ?? 0;
+
+  const spinMutation = useMutation<FortuneSpinResult, Error, void>({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/fortune/spin", {});
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Impossible de lancer la roue");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setLastReward(data.reward);
+      queryClient.setQueryData(["/api/fortune/status"], {
+        remainingSpins: data.remainingSpins,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      toast({
+        title: "Félicitations !",
+        description: `Vous avez gagné ${data.reward.toLocaleString("fr-FR")} FCFA.`,
+      });
+      window.setTimeout(() => setIsSpinning(false), 1300);
+    },
+    onError: (error) => {
+      setIsSpinning(false);
+      toast({
+        title: "Aucun tour disponible",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const showNoDrawsMessage = () => {
     toast({
-      title: "Nombre de tirages restant : 0",
-      description: "Invitez un ami à vous inscrire pour recevoir un tour gratuit.",
+      title: "Aucun tour disponible",
+      description: `Nombre de tours restants : ${remainingSpins}. Invitez un ami à s'inscrire pour recevoir un tour gratuit.`,
     });
+  };
+
+  const handleSpin = () => {
+    if (loadingFortuneStatus || isSpinning || spinMutation.isPending) return;
+    if (remainingSpins <= 0) {
+      showNoDrawsMessage();
+      return;
+    }
+    setLastReward(null);
+    setIsSpinning(true);
+    spinMutation.mutate();
   };
 
   return (
@@ -186,6 +241,14 @@ export default function CheckinPage() {
             0 12px 19px rgba(157, 50, 24, .25);
           transform: translateX(-50%);
         }
+        .fortune-page .fortune-wheel.is-spinning {
+          animation: fortune-wheel-spin 1.3s cubic-bezier(.12, .72, .18, 1);
+          will-change: transform;
+        }
+        @keyframes fortune-wheel-spin {
+          from { transform: translateX(-50%) rotate(0deg); }
+          to { transform: translateX(-50%) rotate(1440deg); }
+        }
         .fortune-page .fortune-wheel::before {
           position: absolute;
           inset: 29px;
@@ -260,6 +323,10 @@ export default function CheckinPage() {
           font-weight: 800;
           text-shadow: 0 2px 1px rgba(147, 48, 25, .35);
           transform: translate(-50%, -50%);
+        }
+        .fortune-page .fortune-go:disabled {
+          cursor: wait;
+          opacity: .84;
         }
         .fortune-page .fortune-podium {
           position: absolute;
@@ -340,6 +407,13 @@ export default function CheckinPage() {
         .fortune-page .fortune-invite svg {
           width: 21px;
           height: 21px;
+        }
+        .fortune-page .fortune-result {
+          margin: 9px 14px 0;
+          color: #a92b1d;
+          font-size: 15px;
+          font-weight: 700;
+          text-align: center;
         }
         .fortune-page .fortune-copy {
           padding: 26px 24px 54px;
@@ -596,11 +670,18 @@ export default function CheckinPage() {
 
         <section className="fortune-hero" aria-labelledby="fortune-title">
           <h2 id="fortune-title" className="fortune-title">Sortie chanceuse</h2>
-          <div className="fortune-counter">Nombre de tirages restant : 0</div>
+          <div className="fortune-counter">
+            {loadingFortuneStatus ? "Chargement des tours..." : `Nombre de tours restants : ${remainingSpins}`}
+          </div>
+          {lastReward !== null ? (
+            <p className="fortune-result" role="status">
+              Dernier gain : {lastReward.toLocaleString("fr-FR")} FCFA
+            </p>
+          ) : null}
 
           <div className="fortune-wheel-area" aria-label="Roue de la fortune">
             <div className="fortune-wheel-glow" aria-hidden="true" />
-            <div className="fortune-wheel">
+            <div className={`fortune-wheel ${isSpinning ? "is-spinning" : ""}`}>
               <span className="wheel-divider one" aria-hidden="true" />
               <span className="wheel-divider two" aria-hidden="true" />
               <span className="wheel-divider three" aria-hidden="true" />
@@ -630,8 +711,14 @@ export default function CheckinPage() {
                   </span>
                 );
               })}
-              <button type="button" className="fortune-go" onClick={showNoDrawsMessage} aria-label="Lancer le tirage">
-                GO
+              <button
+                type="button"
+                className="fortune-go"
+                onClick={handleSpin}
+                disabled={loadingFortuneStatus || isSpinning || spinMutation.isPending}
+                aria-label="Lancer le tirage"
+              >
+                {spinMutation.isPending ? <Loader2 className="fortune-go-loader animate-spin" aria-hidden="true" /> : "GO"}
               </button>
             </div>
             <div className="fortune-podium" aria-hidden="true" />

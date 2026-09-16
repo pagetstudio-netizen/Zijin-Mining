@@ -229,6 +229,17 @@ export const userTasks = pgTable("user_tasks", {
   rewardClaimed: boolean("reward_claimed").notNull().default(true),
 });
 
+// Referral-earned fortune wheel spins
+export const fortuneSpins = pgTable("fortune_spins", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  reward: integer("reward"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  usedAt: timestamp("used_at"),
+});
+
+export type FortuneSpin = typeof fortuneSpins.$inferSelect;
+
 // Transaction history
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),

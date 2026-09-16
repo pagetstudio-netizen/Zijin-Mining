@@ -62,6 +62,8 @@ import {
 } from "./telegram";
 import express from "express";
 
+const FORTUNE_REWARDS = [5, 10, 30, 100, 300, 1000, 2000, 5000];
+
 // --- Brute-force protection (in-memory) ---
 const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -348,6 +350,13 @@ export async function registerRoutes(
         referredBy,
       });
 
+      if (referredBy) {
+        const referrer = await storage.getUserByReferralCode(referredBy);
+        if (referrer) {
+          await storage.createFortuneSpin(referrer.id);
+        }
+      }
+
       req.session.userId = user.id;
       res.json({ user: { ...user, password: undefined } });
     } catch (error: any) {
@@ -425,6 +434,49 @@ export async function registerRoutes(
     req.session.destroy(() => {
       res.json({ success: true });
     });
+  });
+
+  app.get("/api/fortune/status", requireAuth, async (req, res) => {
+    try {
+      const remainingSpins = await storage.getAvailableFortuneSpinCount(req.session.userId!);
+      res.json({ remainingSpins });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Impossible de charger les tours restants" });
+    }
+  });
+
+  app.post("/api/fortune/spin", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const reward = FORTUNE_REWARDS[Math.floor(Math.random() * FORTUNE_REWARDS.length)];
+      const spin = await storage.claimFortuneSpin(userId, reward);
+
+      if (!spin) {
+        return res.status(400).json({
+          message: "Vous n'avez aucun tour disponible. Invitez un ami à s'inscrire pour recevoir un tour gratuit.",
+          remainingSpins: 0,
+        });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(401).json({ message: "Non authentifié" });
+      }
+
+      const newBalance = (parseFloat(user.balance) + reward).toFixed(2);
+      await storage.updateUser(userId, { balance: newBalance });
+      await storage.createTransaction({
+        userId,
+        type: "fortune_reward",
+        amount: reward.toString(),
+        description: `Gain roue de la fortune : ${reward} FCFA`,
+      });
+
+      const remainingSpins = await storage.getAvailableFortuneSpinCount(userId);
+      res.json({ reward, remainingSpins });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Impossible de lancer la roue" });
+    }
   });
 
   app.post("/api/change-password", requireAuth, async (req, res) => {

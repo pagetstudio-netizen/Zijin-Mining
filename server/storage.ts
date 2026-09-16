@@ -1,9 +1,9 @@
 import { 
   users, products, userProducts, deposits, withdrawals, withdrawalWallets,
-  paymentChannels, paymentNumbers, stakingProducts, userStakings, referralCommissions, tasks, userTasks, transactions, platformSettings, adminAuditLog,
+  paymentChannels, paymentNumbers, stakingProducts, userStakings, referralCommissions, tasks, userTasks, fortuneSpins, transactions, platformSettings, adminAuditLog,
   giftCodes, giftCodeClaims, countries,
   type User, type Product, type UserProduct, type Deposit, type Withdrawal, type WithdrawalWallet,
-  type PaymentChannel, type PaymentNumber, type StakingProduct, type UserStaking, type ReferralCommission, type Task, type UserTask, type Transaction, type PlatformSetting,
+  type PaymentChannel, type PaymentNumber, type StakingProduct, type UserStaking, type ReferralCommission, type Task, type UserTask, type FortuneSpin, type Transaction, type PlatformSetting,
   type GiftCode, type GiftCodeClaim, type Country
 } from "@shared/schema";
 import { db } from "./db";
@@ -82,6 +82,11 @@ export interface IStorage {
   getUserCommissions(userId: number): Promise<number>;
   getTeamStats(userId: number): Promise<{ level1Count: number; level2Count: number; level3Count: number; totalCommission: number; level1Commission: number; level2Commission: number; level3Commission: number; level1Invested: number; level2Invested: number; level3Invested: number; level1Recharged: number }>;
   getTeamStatsSimple(userId: number): Promise<{ level1Count: number; level2Count: number; level3Count: number; totalCommission: number }>;
+
+  // Fortune wheel
+  createFortuneSpin(userId: number): Promise<FortuneSpin>;
+  getAvailableFortuneSpinCount(userId: number): Promise<number>;
+  claimFortuneSpin(userId: number, reward: number): Promise<FortuneSpin | undefined>;
   
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -844,6 +849,34 @@ export class DatabaseStorage implements IStorage {
       .from(referralCommissions)
       .where(eq(referralCommissions.userId, userId));
     return parseFloat(result[0]?.total || "0");
+  }
+
+  async createFortuneSpin(userId: number): Promise<FortuneSpin> {
+    const [spin] = await db.insert(fortuneSpins).values({ userId }).returning();
+    return spin;
+  }
+
+  async getAvailableFortuneSpinCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(fortuneSpins)
+      .where(and(eq(fortuneSpins.userId, userId), isNull(fortuneSpins.usedAt)));
+    return Number(result[0]?.count || 0);
+  }
+
+  async claimFortuneSpin(userId: number, reward: number): Promise<FortuneSpin | undefined> {
+    const [available] = await db.select({ id: fortuneSpins.id })
+      .from(fortuneSpins)
+      .where(and(eq(fortuneSpins.userId, userId), isNull(fortuneSpins.usedAt)))
+      .limit(1);
+
+    if (!available) return undefined;
+
+    const [claimed] = await db.update(fortuneSpins)
+      .set({ reward, usedAt: new Date() })
+      .where(and(eq(fortuneSpins.id, available.id), isNull(fortuneSpins.usedAt)))
+      .returning();
+
+    return claimed;
   }
 
   async getTeamStatsSimple(userId: number): Promise<{ level1Count: number; level2Count: number; level3Count: number; totalCommission: number }> {
