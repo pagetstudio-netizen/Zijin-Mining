@@ -93,91 +93,141 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-/* TON green theme.
- * The dashboard keeps its own visual identity; App.tsx only adds this scope
- * to the other routes so the dashboard is not recolored by these overrides.
+/* Zijin Mining brand theme.
+ * The payment page is intentionally excluded in App.tsx so RobotPay keeps
+ * its existing payment experience and colors.
  */
-.ton-theme {
-  --ton-green: #00cc2c;
-  --ton-green-dark: #008f24;
-  --ton-green-deep: #006b1c;
-  --ton-green-soft: #e9f9ec;
-  --ton-gradient: linear-gradient(112deg, #00cc2c 0%, #008f24 100%);
+.zijin-theme {
+  --zijin-gold: #d9a600;
+  --zijin-gold-dark: #b68100;
+  --zijin-red: #c90018;
+  --zijin-ink: #181818;
+  --zijin-cream: #fbf7eb;
+  --zijin-gradient: linear-gradient(112deg, #d9a600 0%, #b68100 100%);
 
-  --background: 120 25% 97%;
-  --foreground: 130 18% 13%;
-  --border: 130 18% 85%;
+  --background: 45 45% 97%;
+  --foreground: 0 0% 10%;
+  --border: 42 28% 82%;
   --card: 0 0% 100%;
-  --card-foreground: 130 18% 13%;
-  --card-border: 130 18% 90%;
+  --card-foreground: 0 0% 10%;
+  --card-border: 42 28% 88%;
   --popover: 0 0% 100%;
-  --popover-foreground: 130 18% 13%;
-  --popover-border: 130 18% 90%;
-  --primary: 133 100% 40%;
+  --popover-foreground: 0 0% 10%;
+  --popover-border: 42 28% 88%;
+  --primary: 46 93% 43%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 120 20% 94%;
-  --secondary-foreground: 130 18% 13%;
-  --muted: 120 16% 93%;
-  --muted-foreground: 130 8% 43%;
-  --accent: 125 65% 93%;
-  --accent-foreground: 133 100% 30%;
-  --input: 130 15% 84%;
-  --ring: 133 100% 40%;
-  --chart-1: 133 100% 40%;
-  --chart-2: 145 70% 38%;
-  --chart-3: 110 60% 42%;
-  --chart-4: 165 55% 40%;
-  --chart-5: 85 60% 42%;
+  --secondary: 45 42% 93%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 45 30% 94%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 45 70% 90%;
+  --accent-foreground: 0 0% 15%;
+  --input: 42 25% 82%;
+  --ring: 46 93% 43%;
+  --chart-1: 46 93% 43%;
+  --chart-2: 0 78% 42%;
+  --chart-3: 35 85% 50%;
+  --chart-4: 20 70% 45%;
+  --chart-5: 0 0% 30%;
 }
 
-/* Recolor recurring hard-coded brand utilities without changing dashboard
- * styles, which intentionally lives outside .ton-theme.
+/* Recolor recurring hard-coded green/blue utilities outside RobotPay.
  */
-.ton-theme [class~="text-[#3174d1]"],
-.ton-theme [class~="text-[#2196F3]"],
-.ton-theme [class~="text-[#1598e7]"],
-.ton-theme [class~="text-[#0789c9]"],
-.ton-theme [class~="text-[#7fc9ff]"],
-.ton-theme [class~="text-[#FF4500]"] {
-  color: var(--ton-green) !important;
+.zijin-theme [class*="text-green-"],
+.zijin-theme [class~="text-[#00CC2C]"],
+.zijin-theme [class~="text-[#3174d1]"],
+.zijin-theme [class~="text-[#2196F3]"],
+.zijin-theme [class~="text-[#1598e7]"],
+.zijin-theme [class~="text-[#0789c9]"],
+.zijin-theme [class~="text-[#7fc9ff]"],
+.zijin-theme [class~="text-[#FF4500]"] {
+  color: var(--zijin-gold) !important;
 }
 
-.ton-theme [class~="bg-[#3174d1]"],
-.ton-theme [class~="bg-[#2196F3]"],
-.ton-theme [class~="bg-[#55c9e5]"],
-.ton-theme [class~="bg-[#FF4500]"] {
-  background-color: var(--ton-green) !important;
+.zijin-theme [class*="bg-green-"],
+.zijin-theme [class~="bg-[#3174d1]"],
+.zijin-theme [class~="bg-[#2196F3]"],
+.zijin-theme [class~="bg-[#55c9e5]"],
+.zijin-theme [class~="bg-[#FF4500]"] {
+  background-color: var(--zijin-gold) !important;
 }
 
-.ton-theme [class~="border-[#3174d1]"],
-.ton-theme [class~="border-[#2196F3]"],
-.ton-theme [class~="border-[#55c9e5]"],
-.ton-theme [class~="border-[#7fc9ff]"],
-.ton-theme [class~="border-[#FF4500]"] {
-  border-color: var(--ton-green) !important;
+.zijin-theme [class*="border-green-"],
+.zijin-theme [class~="border-[#3174d1]"],
+.zijin-theme [class~="border-[#2196F3]"],
+.zijin-theme [class~="border-[#55c9e5]"],
+.zijin-theme [class~="border-[#7fc9ff]"],
+.zijin-theme [class~="border-[#FF4500]"] {
+  border-color: var(--zijin-gold) !important;
 }
 
-/* Inline gradients are used for the branded headers and action buttons.
- * Preserve black authentication overlays while changing colored gradients.
+/* Inline gradients are used for branded headers and action buttons.
  */
-.ton-theme [style*="linear-gradient"]:not([style*="#000000"]):not([style*="rgb(0, 0, 0)"]):not([style*="rgba(0,0,0"]):not([style*="rgba(0, 0, 0"]) {
-  background: var(--ton-gradient) !important;
+.zijin-theme [style*="linear-gradient"]:not([style*="#000000"]):not([style*="rgb(0, 0, 0)"]):not([style*="rgba(0,0,0"]):not([style*="rgba(0, 0, 0"]) {
+  background: var(--zijin-gradient) !important;
 }
 
-.ton-theme [style*="#3174d1"],
-.ton-theme [style*="#55c9e5"],
-.ton-theme [style*="#2196F3"],
-.ton-theme [style*="#FF4500"],
-.ton-theme [style*="#E03E00"] {
-  border-color: var(--ton-green) !important;
-  color: var(--ton-green) !important;
+.zijin-theme [style*="#00cc2c"],
+.zijin-theme [style*="#00CC2C"],
+.zijin-theme [style*="#008f24"],
+.zijin-theme [style*="#006b1c"],
+.zijin-theme [style*="#009d22"],
+.zijin-theme [style*="#00cc00"],
+.zijin-theme [style*="#3174d1"],
+.zijin-theme [style*="#55c9e5"],
+.zijin-theme [style*="#2196F3"],
+.zijin-theme [style*="#FF4500"],
+.zijin-theme [style*="#E03E00"] {
+  border-color: var(--zijin-gold) !important;
+  color: var(--zijin-gold) !important;
 }
 
-.ton-theme [style*="linear-gradient"][style*="#3174d1"],
-.ton-theme [style*="linear-gradient"][style*="#55c9e5"],
-.ton-theme [style*="linear-gradient"][style*="#FF4500"],
-.ton-theme [style*="linear-gradient"][style*="#E03E00"] {
+.zijin-theme [style*="linear-gradient"][style*="#3174d1"],
+.zijin-theme [style*="linear-gradient"][style*="#55c9e5"],
+.zijin-theme [style*="linear-gradient"][style*="#FF4500"],
+.zijin-theme [style*="linear-gradient"][style*="#E03E00"] {
   color: white !important;
+}
+
+.zijin-theme .auth-reference {
+  background: #17130a;
+  color: var(--zijin-gold);
+}
+
+.zijin-theme .auth-reference .auth-screen,
+.zijin-theme .auth-reference .auth-panel {
+  background: #231d0d;
+}
+
+.zijin-theme .auth-reference .auth-brand,
+.zijin-theme .auth-reference .auth-title {
+  color: #fff;
+}
+
+.zijin-theme .auth-reference .auth-brand {
+  display: block;
+  width: 184px;
+  height: 56px;
+  margin: 0 0 22px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+  object-position: center;
+}
+
+.zijin-theme .auth-reference .auth-field input {
+  color: var(--zijin-gold);
+}
+
+.zijin-theme .auth-reference .auth-field input::placeholder,
+.zijin-theme .auth-reference .auth-prefix,
+.zijin-theme .auth-reference .auth-field-icon {
+  color: var(--zijin-gold);
+}
+
+.zijin-theme .auth-reference .auth-submit {
+  color: var(--zijin-gold);
 }
 
 .dark {

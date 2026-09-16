@@ -1,10 +1,10 @@
 ---
-name: TON green theme
-description: Brand-color scope for the TON visual refresh.
+name: Zijin brand theme
+description: Brand-color scope for the Zijin Mining visual refresh.
 ---
 
-Use the bright TON green as the primary visual color on pages outside the user dashboard. Keep the dashboard’s existing banner and color treatment unchanged.
+Use Zijin Mining’s gold, red, black, and white palette as the primary visual language across the site. Keep the `/robotpay` payment page’s existing colors and payment presentation unchanged.
 
-**Why:** The user requested a platform-wide TON green refresh while explicitly preserving the dashboard as-is.
+**Why:** The user supplied the Zijin Mining logo and corporate images, requested that the site no longer be green, and explicitly preserved the payment page.
 
-**How to apply:** New or restyled non-dashboard pages should use the TON green theme tokens. Do not recolor the dashboard unless the user explicitly changes this direction.
+**How to apply:** Use the Zijin theme tokens for new or restyled site pages. Exclude `/robotpay` from the theme scope. Do not replace product imagery until the user supplies the product images.

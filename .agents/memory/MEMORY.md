@@ -4,7 +4,7 @@
 - [Imported database setup](imported-database-setup.md) — Preserve an existing Replit session table when applying a first-run Drizzle schema.
 - [Plesk GitHub deployment](plesk-github-deployment.md) — Plesk pulls a committed dist build and starts dist/index.cjs relative to the application root.
 - [Login privacy](login-privacy.md) — Do not persist passwords or phone numbers in browser storage; privacy scans classify remembered phone numbers as sensitive.
-- [TON green theme](ton-green-theme.md) — Apply TON green branding outside the dashboard; keep the dashboard’s current visual identity unchanged.
+- [Zijin brand theme](ton-green-theme.md) — Use Zijin gold/red branding across the site; keep RobotPay’s existing payment colors unchanged.
 - [InPay callback classification](inpay-callbacks.md) — InPay payin and payout callbacks can both include order_number; classify using the merchant reference prefix first.
 - [InPay IP whitelist](inpay-ip-whitelist.md) — InPay rejects API calls with errno 5 until the server's public egress IP is whitelisted.
 - [AshtechPay Burkina flow](ashtechpay-burkina.md) — BF uses exact operator names and requires the returned reference on OTP retries.

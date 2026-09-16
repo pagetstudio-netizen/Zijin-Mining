@@ -10,7 +10,7 @@ import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { useLocation } from "wouter";
 import type { Product } from "@shared/schema";
 
-import tonLogo  from "@assets/images_(25)_1787362424281.png";
+import tonLogo  from "@assets/images_(32)_1789546290870.png";
 import serviceIcon from "@assets/20260311_214852_1773265973964.png";
 import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
@@ -171,7 +171,7 @@ export default function InvestPage() {
                     ].map(({ label, value }) => (
                       <div key={label} className="flex items-center justify-between">
                         <span className="text-gray-400 text-[11px]">{label}</span>
-                        <span className="font-bold text-[11px]" style={{ color: "var(--ton-green)" }}>{value}</span>
+                        <span className="font-bold text-[11px]" style={{ color: "var(--zijin-gold)" }}>{value}</span>
                       </div>
                     ))}
                   </div>

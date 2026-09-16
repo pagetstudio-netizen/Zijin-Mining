@@ -147,9 +147,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
 function BrandThemeScope({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const isDashboard = location === "/";
+  const isPaymentPage = location === "/robotpay";
 
-  return <div className={isDashboard ? undefined : "ton-theme"}>{children}</div>;
+  return <div className={isPaymentPage ? undefined : "zijin-theme"}>{children}</div>;
 }
 
 function Router() {

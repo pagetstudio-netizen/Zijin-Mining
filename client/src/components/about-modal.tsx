@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import tonLogo from "@assets/images_(25)_1787362424281.png";
+import tonLogo from "@assets/images_(32)_1789546290870.png";
 
 interface AboutModalProps {
   open: boolean;

@@ -98,7 +98,7 @@ export default function RewardsPage() {
                   data-testid={`task-item-${task.id}`}
                 >
                   <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: "#e3f2fd" }}>
-                    <Users className="w-5 h-5" style={{ color: "var(--ton-green)" }} />
+                    <Users className="w-5 h-5" style={{ color: "var(--zijin-gold)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{task.description}</p>

@@ -124,7 +124,7 @@ export default function WithdrawalPage() {
   if (walletsLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00CC2C]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#D9A600]" />
       </div>
     );
   }
@@ -296,7 +296,7 @@ export default function WithdrawalPage() {
           margin: 12px 16px 0;
           padding: 0 17px;
           border-radius: 5px;
-          background: linear-gradient(112deg, #00CC2C 0%, #009d22 100%);
+          background: linear-gradient(112deg, #D9A600 0%, #B68100 100%);
           color: white;
           text-align: left;
           box-shadow: 0 1px 2px rgba(214,153,0,.15);
@@ -356,7 +356,7 @@ export default function WithdrawalPage() {
           justify-content: center;
           margin: 4px 24px 35px;
           border-radius: 29px;
-          background: linear-gradient(112deg, #00CC2C 0%, #009d22 100%);
+          background: linear-gradient(112deg, #D9A600 0%, #B68100 100%);
           color: white;
           font-size: 17px;
           font-weight: 600;

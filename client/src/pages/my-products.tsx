@@ -172,7 +172,7 @@ export default function MyProductsPage() {
           <div>
             {loadingProducts ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-[#00CC2C]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#D9A600]" />
               </div>
             ) : paidProducts.length === 0 ? (
               <div className="empty">
@@ -212,7 +212,7 @@ export default function MyProductsPage() {
             <div>
               {loadingUserProducts ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#00CC2C]" />
+                  <Loader2 className="w-8 h-8 animate-spin text-[#D9A600]" />
                 </div>
               ) : allUserProducts.length === 0 ? (
                 <div className="empty">
@@ -292,7 +292,7 @@ export default function MyProductsPage() {
                 onClick={() => purchaseMutation.mutate(confirmProduct.id)}
                 disabled={purchaseMutation.isPending}
                 className="flex-1 py-4 font-bold text-base text-white flex items-center justify-center gap-1.5 active:opacity-90 transition-opacity disabled:opacity-60"
-                style={{ background: "#00CC2C" }}
+                style={{ background: "#D9A600" }}
                 data-testid="button-confirm-purchase"
               >
                 {purchaseMutation.isPending

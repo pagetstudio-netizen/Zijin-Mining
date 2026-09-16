@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
 import { ChevronDown, Code2, Loader2, LockKeyhole, Square } from "lucide-react";
+import zijinLogo from "@assets/ac25e2a8581a41008a0930d734236922_1789546290888.png";
 
 const registerSchema = z.object({
   phone: z.string().min(8, "Numéro de téléphone invalide"),
@@ -133,6 +134,7 @@ export default function RegisterPage() {
 
       <div className="auth-screen">
         <section className="auth-panel">
+          <img className="auth-brand" src={zijinLogo} alt="Zijin Mining" />
           <h1 className="auth-title">REGISTER</h1>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <input type="hidden" {...form.register("country")} />

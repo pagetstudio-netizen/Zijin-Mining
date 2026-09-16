@@ -42,8 +42,8 @@ function formatDate(dateStr: string): string {
   return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
 }
 
-const GREEN = "#00CC2C";
-const GREEN_BG = "#e9f9ec";
+const GREEN = "#D9A600";
+const GREEN_BG = "#fbf7eb";
 
 export default function TeamDetailsPage() {
   const [activeLevel, setActiveLevel] = useState<1 | 2 | 3>(1);

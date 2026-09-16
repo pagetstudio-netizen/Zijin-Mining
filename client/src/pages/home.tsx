@@ -13,7 +13,7 @@ import foxBanner from "@assets/téléchargement_-_2026-08-21T234856.376_17873562
 import zootopiaDuo from "@assets/20260822_002744_1787358732420.png";
 import judy from "@assets/20260822_002731_1787358732448.png";
 import sheep from "@assets/20260822_002632_1787358732474.png";
-import homeHeroReference from "@assets/20260822_025245_1787367215372.png";
+import homeHeroReference from "@assets/slike-kina-111-1024x576_1789546290852.jpg";
 import welcomeImage from "@assets/20260415_134352_1787438067693.png";
 import telegramGroupImage from "@assets/20260411_144546_1787438067855.png";
 import closePopupImage from "@assets/20260411_144711_1787438067885.png";

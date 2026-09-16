@@ -13,8 +13,8 @@ import type { PaymentNumber } from "@shared/schema";
 import rechargeReference from "@assets/IMG-20260821-WA0163_1787357122336.jpg";
 import historyIcon from "@assets/20260410_193219_1787363717022.png";
 
-const TON_GREEN = "#00CC2C";
-const TON_GREEN_DARK = "#009d22";
+const TON_GREEN = "#D9A600";
+const TON_GREEN_DARK = "#B68100";
 const TON_GRADIENT = `linear-gradient(112deg, ${TON_GREEN} 0%, ${TON_GREEN_DARK} 100%)`;
 
 type Step =

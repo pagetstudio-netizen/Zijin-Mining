@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 
-import serviceImage from "@assets/images_(59)_1787364932839.jpeg";
-import brandLogo from "@assets/logo-ton_1787364932867.png";
-import tonMachinesBanner from "@assets/images_(70)_1787365314673.jpeg";
+import serviceImage from "@assets/images_(86)_1789546290607.jpeg";
+import brandLogo from "@assets/ac25e2a8581a41008a0930d734236922_1789546290888.png";
+import tonMachinesBanner from "@assets/slike-kina-111-1024x576_1789546290852.jpg";
 
 interface LinksSettings {
   supportLink: string;
@@ -32,19 +32,19 @@ export default function ServicePage() {
         .service-reference .service-back { position: absolute; top: 25px; left: 23px; display: grid; width: 42px; height: 42px; place-items: center; border: 0; background: transparent; color: #111; }
         .service-reference .service-back svg { width: 33px; height: 33px; stroke-width: 2.1; }
         .service-reference .service-logo { position: absolute; top: 20px; left: 123px; width: 61px; height: 46px; object-fit: contain; }
-        .service-reference .service-title { position: absolute; top: 34px; left: 236px; margin: 0; color: #009d22; font-size: 21px; font-weight: 400; line-height: 25px; }
+        .service-reference .service-title { position: absolute; top: 34px; left: 236px; margin: 0; color: #c90018; font-size: 21px; font-weight: 700; line-height: 25px; }
         .service-reference .benefits { min-height: 178px; box-sizing: border-box; padding: 0 0 13px; background: #eeeeee; }
         .service-reference .benefit-banner { display: block; width: 100%; height: auto; }
-        .service-reference .telegram-section { box-sizing: border-box; padding: 30px 21px 29px; background: #00cc00; }
+        .service-reference .telegram-section { box-sizing: border-box; padding: 30px 21px 29px; background: #d9a600; }
         .service-reference .telegram-title { margin: 0 0 27px; color: #fff; font-size: 35px; font-weight: 400; line-height: 42px; text-align: center; }
         .service-reference .telegram-grid { display: grid; grid-template-columns: minmax(0, 42.13%) minmax(0, 1fr); column-gap: 16px; align-items: start; }
         .service-reference .bike-image { width: 100%; height: auto; aspect-ratio: 606 / 506; margin-top: 20px; object-fit: contain; background: #000; }
         .service-reference .telegram-actions { min-width: 0; }
-        .service-reference .telegram-link { position: relative; display: grid; width: 100%; align-items: center; justify-items: center; box-sizing: border-box; border: 0; border-radius: 46px; padding: 0 37px 0 10px; background: #fff; color: #009d22; font-size: 21px; font-weight: 400; line-height: 28px; text-align: center; white-space: pre-line; box-shadow: 0 1px 2px rgba(0, 106, 0, .12); transition: transform .12s ease, background-color .12s ease; }
+        .service-reference .telegram-link { position: relative; display: grid; width: 100%; align-items: center; justify-items: center; box-sizing: border-box; border: 0; border-radius: 46px; padding: 0 37px 0 10px; background: #fff; color: #b68100; font-size: 21px; font-weight: 400; line-height: 28px; text-align: center; white-space: pre-line; box-shadow: 0 1px 2px rgba(120, 80, 0, .12); transition: transform .12s ease, background-color .12s ease; }
         .service-reference .telegram-link.short { height: 60px; }
         .service-reference .telegram-link.tall { height: 90px; margin-top: 15px; }
         .service-reference .telegram-link:active { transform: scale(.98); background: #f6fff6; }
-        .service-reference .telegram-link svg { position: absolute; right: 11px; width: 25px; height: 25px; color: #009d22; stroke-width: 1.9; }
+        .service-reference .telegram-link svg { position: absolute; right: 11px; width: 25px; height: 25px; color: #c90018; stroke-width: 1.9; }
         .service-reference .online-hours { margin-top: 11px; color: #fff; font-size: clamp(23px, 6.25vw, 32px); font-weight: 400; line-height: 1.4; text-align: center; white-space: normal; }
         .service-reference .online-hours p { margin: 0; }
         .service-reference .advice { min-height: 210px; box-sizing: border-box; padding: 14px 21px 82px; background: #eeeeee; }
@@ -76,7 +76,7 @@ export default function ServicePage() {
         </header>
 
         <section className="benefits" aria-label="Nos garanties">
-          <img className="benefit-banner" src={tonMachinesBanner} alt="Terminaux TON" />
+          <img className="benefit-banner" src={tonMachinesBanner} alt="Site Zijin Mining" />
         </section>
 
         <section className="telegram-section" aria-labelledby="telegram-heading">

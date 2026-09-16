@@ -13,8 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ADMIN_PATH } from "@/lib/admin-path";
-import accountBackground from "@assets/images_(72)_1787363798761.jpeg";
-import tonLogo from "@assets/images_(25)_1787363798796.png";
+import accountBackground from "@assets/images_(82)_1789546290792.jpeg";
+import tonLogo from "@assets/images_(32)_1789546290870.png";
 import rechargeIcon from "@assets/6_1787388071510.png";
 import withdrawalIcon from "@assets/mine-mod-bankcard-CLOhqwHj_1787388454905.png";
 import historyIcon from "@assets/4-1_1787388071574.png";
@@ -27,7 +27,7 @@ import passwordIcon from "@assets/20260822_002632_1787387728169.png";
 import rulesIcon from "@assets/20260822_002803_1787387728051.png";
 import logoutIcon from "@assets/logout_1787368185297.png";
 
-const tonGreen = "#00CC2C";
+const tonGreen = "#D9A600";
 
 export default function AccountPage() {
   const { user, logout } = useAuth();
@@ -165,7 +165,7 @@ export default function AccountPage() {
           overflow: hidden;
           border-radius: 14px;
           padding: 0 24px;
-          background: linear-gradient(110deg, #00cc2c 0%, #008f24 100%);
+          background: linear-gradient(110deg, #d9a600 0%, #b68100 100%);
         }
         .account-reference .summary-amount {
            min-width: 0;
@@ -196,7 +196,7 @@ export default function AccountPage() {
           margin: 14px 16px 0;
           overflow: hidden;
           border-radius: 14px;
-          background: #006b1c;
+          background: #8f6a00;
         }
         .account-reference .promo-banner img {
           width: 100%;
@@ -311,7 +311,7 @@ export default function AccountPage() {
           border-radius: 14px;
           border: 1.5px solid ${tonGreen};
           padding: 13px;
-          color: #009d22;
+          color: #b68100;
           background: white;
           font-size: 14px;
           font-weight: 700;
