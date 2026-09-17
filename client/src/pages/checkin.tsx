@@ -33,7 +33,11 @@ export default function CheckinPage() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [lastReward, setLastReward] = useState<number | null>(null);
 
-  const { data: fortuneStatus, isLoading: loadingFortuneStatus } = useQuery<FortuneStatus>({
+  const {
+    data: fortuneStatus,
+    isLoading: loadingFortuneStatus,
+    isError: fortuneStatusError,
+  } = useQuery<FortuneStatus>({
     queryKey: ["/api/fortune/status"],
   });
 
@@ -85,6 +89,14 @@ export default function CheckinPage() {
 
   const handleSpin = () => {
     if (loadingFortuneStatus || isSpinning || spinMutation.isPending) return;
+    if (fortuneStatusError) {
+      toast({
+        title: "Erreur de chargement",
+        description: "Actualisez la page puis réessayez.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (remainingSpins <= 0) {
       showNoDrawsMessage();
       return;
@@ -704,7 +716,11 @@ export default function CheckinPage() {
         <section className="fortune-hero" aria-labelledby="fortune-title">
           <h2 id="fortune-title" className="fortune-title">Sortie chanceuse</h2>
           <div className="fortune-counter">
-            {loadingFortuneStatus ? "Chargement des tours..." : `Nombre de tours restants : ${remainingSpins}`}
+            {loadingFortuneStatus
+              ? "Chargement des tours..."
+              : fortuneStatusError
+                ? "Impossible de charger les tours"
+                : `Nombre de tours restants : ${remainingSpins}`}
           </div>
           {lastReward !== null ? (
             <p className="fortune-result" role="status">
@@ -748,7 +764,7 @@ export default function CheckinPage() {
                 type="button"
                 className="fortune-go"
                 onClick={handleSpin}
-                disabled={loadingFortuneStatus || isSpinning || spinMutation.isPending}
+                disabled={loadingFortuneStatus || fortuneStatusError || isSpinning || spinMutation.isPending}
                 aria-label="Lancer le tirage"
               >
                 {spinMutation.isPending ? <Loader2 className="fortune-go-loader animate-spin" aria-hidden="true" /> : "GO"}
