@@ -279,6 +279,7 @@ export default function CheckinPage() {
           border: 2px solid rgba(212, 128, 31, .4);
           border-radius: 50%;
           content: "";
+          pointer-events: none;
         }
         .fortune-page .fortune-wheel::after {
           position: absolute;
@@ -286,6 +287,7 @@ export default function CheckinPage() {
           border: 2px dashed rgba(255, 250, 190, .8);
           border-radius: 50%;
           content: "";
+          pointer-events: none;
         }
         .fortune-page .wheel-divider {
           position: absolute;
@@ -295,6 +297,7 @@ export default function CheckinPage() {
           height: 91%;
           background: rgba(211, 119, 25, .38);
           transform-origin: center;
+          pointer-events: none;
         }
         .fortune-page .wheel-divider.one { transform: translate(-50%, -50%) rotate(0deg); }
         .fortune-page .wheel-divider.two { transform: translate(-50%, -50%) rotate(45deg); }
@@ -313,6 +316,7 @@ export default function CheckinPage() {
           font-size: 16px;
           font-weight: 400;
           text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
+          pointer-events: none;
         }
         .fortune-page .wheel-coin {
           position: absolute;
@@ -329,6 +333,7 @@ export default function CheckinPage() {
           font-size: 20px;
           font-weight: 800;
           box-shadow: 0 2px 3px rgba(184, 89, 10, .25), inset 0 0 0 2px rgba(255, 247, 154, .7);
+          pointer-events: none;
         }
         .fortune-page .fortune-go {
           position: absolute;
@@ -347,6 +352,7 @@ export default function CheckinPage() {
           font-weight: 800;
           text-shadow: 0 2px 1px rgba(147, 48, 25, .35);
           transform: translate(-50%, -50%);
+          z-index: 2;
         }
         .fortune-page .fortune-go:disabled {
           cursor: wait;
