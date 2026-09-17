@@ -512,8 +512,12 @@ export default function CheckinPage() {
         .fortune-page .fortune-dialog {
           position: relative;
           width: min(100%, 438px);
-          min-height: 395px;
-          overflow: visible;
+          height: min(620px, calc(100vh - 48px));
+          min-height: 0;
+          max-height: calc(100vh - 48px);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
           border: 6px solid #f5d39b;
           border-radius: 26px 26px 34px 34px;
           background:
@@ -582,7 +586,9 @@ export default function CheckinPage() {
         .fortune-page .fortune-dialog-body {
           position: relative;
           z-index: 1;
-          min-height: 330px;
+          min-height: 0;
+          flex: 1;
+          overflow: hidden;
           padding: 79px 23px 91px;
         }
         .fortune-page .fortune-dialog-grid {
@@ -639,7 +645,28 @@ export default function CheckinPage() {
           min-height: 220px;
         }
         .fortune-page .fortune-records {
-          min-height: 220px;
+          display: flex;
+          height: 100%;
+          min-height: 0;
+          flex-direction: column;
+        }
+        .fortune-page .fortune-record-list {
+          min-height: 0;
+          flex: 1;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          scrollbar-color: #d78a55 #fff1f4;
+          scrollbar-width: thin;
+        }
+        .fortune-page .fortune-record-list::-webkit-scrollbar {
+          width: 6px;
+        }
+        .fortune-page .fortune-record-list::-webkit-scrollbar-thumb {
+          border-radius: 999px;
+          background: #d78a55;
+        }
+        .fortune-page .fortune-record-list::-webkit-scrollbar-track {
+          background: #fff1f4;
         }
         .fortune-page .fortune-record-row {
           display: grid;
@@ -970,33 +997,35 @@ export default function CheckinPage() {
                     <span>Temps</span>
                     <span>Tirer un bonus</span>
                   </div>
-                  {loadingFortuneRecords ? (
-                    <div className="flex min-h-[180px] items-center justify-center">
-                      <Loader2 className="h-7 w-7 animate-spin text-[#bd3a1e]" aria-label="Chargement" />
-                    </div>
-                  ) : fortuneRecords.length > 0 ? (
-                    fortuneRecords.map((record) => (
-                      <div className="fortune-record-row" key={record.id}>
-                        <span className="fortune-record-date">
-                          {record.usedAt
-                            ? new Date(record.usedAt).toLocaleString("fr-FR", {
-                                dateStyle: "short",
-                                timeStyle: "short",
-                              })
-                            : "—"}
-                        </span>
-                        <span className="fortune-record-amount">
-                          {record.reward === null
-                            ? "—"
-                            : `${record.reward.toLocaleString("fr-FR")} FCFA`}
-                        </span>
+                  <div className="fortune-record-list">
+                    {loadingFortuneRecords ? (
+                      <div className="flex min-h-[180px] items-center justify-center">
+                        <Loader2 className="h-7 w-7 animate-spin text-[#bd3a1e]" aria-label="Chargement" />
                       </div>
-                    ))
-                  ) : (
-                    <div className="flex min-h-[180px] items-center justify-center px-4 text-center text-sm text-[#8e6b65]">
-                      Aucun gain reçu pour le moment.
-                    </div>
-                  )}
+                    ) : fortuneRecords.length > 0 ? (
+                      fortuneRecords.map((record) => (
+                        <div className="fortune-record-row" key={record.id}>
+                          <span className="fortune-record-date">
+                            {record.usedAt
+                              ? new Date(record.usedAt).toLocaleString("fr-FR", {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                })
+                              : "—"}
+                          </span>
+                          <span className="fortune-record-amount">
+                            {record.reward === null
+                              ? "—"
+                              : `${record.reward.toLocaleString("fr-FR")} FCFA`}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex min-h-[180px] items-center justify-center px-4 text-center text-sm text-[#8e6b65]">
+                        Aucun gain reçu pour le moment.
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
