@@ -1,12 +1,15 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
-import { ArrowLeft, BarChart3, FileText, Gift, HelpCircle, Share2 } from "lucide-react";
+import { ArrowLeft, BarChart3, Check, Copy, FileText, Gift, HelpCircle, Share2, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
+import { SiFacebook, SiInstagram, SiTelegram, SiWhatsapp } from "react-icons/si";
+import { toDataURL as generateQrCode } from "qrcode";
+import { useAuth } from "@/lib/auth";
 
-type FortuneModal = "ranking" | "records" | null;
+type FortuneModal = "ranking" | "records" | "invite" | null;
 type FortuneStatus = { remainingSpins: number };
 type FortuneSpinResult = { reward: number; remainingSpins: number; wheelIndex: number };
 type FortuneRecord = {
@@ -34,13 +37,19 @@ const rankingRows = [
 export default function CheckinPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [modal, setModal] = useState<FortuneModal>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [lastReward, setLastReward] = useState<number | null>(null);
   const [wheelRotation, setWheelRotation] = useState(1800);
   const [fortuneOutcome, setFortuneOutcome] = useState<FortuneOutcome | null>(null);
+  const [inviteQrCode, setInviteQrCode] = useState("");
+  const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const spinRequestLocked = useRef(false);
   const spinDuration = 3400;
+  const inviteLink = user?.referralCode
+    ? `${window.location.origin}/invitation?invite?code=${encodeURIComponent(user.referralCode)}`
+    : "";
 
   useEffect(() => {
     if (!modal && !fortuneOutcome) return;
@@ -55,6 +64,33 @@ export default function CheckinPage() {
       document.body.style.overflow = bodyOverflow;
     };
   }, [modal, fortuneOutcome]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!inviteLink) {
+      setInviteQrCode("");
+      return;
+    }
+
+    generateQrCode(inviteLink, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 220,
+      color: {
+        dark: "#4a231a",
+        light: "#fffdf4",
+      },
+    }).then((dataUrl) => {
+      if (!cancelled) setInviteQrCode(dataUrl);
+    }).catch(() => {
+      if (!cancelled) setInviteQrCode("");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [inviteLink]);
 
   const {
     data: fortuneStatus,
@@ -118,6 +154,38 @@ export default function CheckinPage() {
 
   const showNoDrawsMessage = () => {
     showLossPopup(`Nombre de tours restants : ${remainingSpins}. Obtenez un tour pour rejouer.`);
+  };
+
+  const copyInviteLink = async () => {
+    if (!inviteLink) return;
+
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setInviteLinkCopied(true);
+      toast({ title: "Lien copié !" });
+      window.setTimeout(() => setInviteLinkCopied(false), 1800);
+    } catch {
+      toast({ title: "Copie impossible", description: "Sélectionnez le lien pour le copier." });
+    }
+  };
+
+  const shareInviteLink = (network: "telegram" | "whatsapp" | "facebook" | "instagram") => {
+    if (!inviteLink) return;
+
+    if (network === "instagram") {
+      void copyInviteLink();
+      return;
+    }
+
+    const encodedLink = encodeURIComponent(inviteLink);
+    const encodedMessage = encodeURIComponent("Rejoignez-moi sur Zijin Mining !");
+    const shareUrls = {
+      telegram: `https://t.me/share/url?url=${encodedLink}&text=${encodedMessage}`,
+      whatsapp: `https://wa.me/?text=${encodedMessage}%20${encodedLink}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`,
+    };
+
+    window.open(shareUrls[network], "_blank", "noopener,noreferrer");
   };
 
   const handleSpin = () => {
@@ -606,6 +674,133 @@ export default function CheckinPage() {
           overflow: hidden;
           padding: 79px 23px 91px;
         }
+        .fortune-page .fortune-invite-dialog {
+          height: auto;
+          max-height: calc(100vh - 48px);
+        }
+        .fortune-page .fortune-invite-dialog .fortune-dialog-body {
+          flex: 0 1 auto;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          padding: 76px 23px 91px;
+        }
+        .fortune-page .fortune-invite-title {
+          margin: 0 0 8px;
+          color: #74372c;
+          font-size: 25px;
+          font-weight: 900;
+          text-align: center;
+        }
+        .fortune-page .fortune-invite-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .fortune-page .fortune-invite-lead {
+          max-width: 290px;
+          margin: 0 auto 12px;
+          color: #8e6b65;
+          font-size: 14px;
+          line-height: 1.35;
+          text-align: center;
+        }
+        .fortune-page .fortune-qr-shell {
+          display: grid;
+          width: 220px;
+          height: 220px;
+          place-items: center;
+          margin: 0 auto 14px;
+          border: 8px solid white;
+          border-radius: 14px;
+          background: #fffdf4;
+          box-shadow: 0 4px 12px rgba(76, 35, 24, .16);
+        }
+        .fortune-page .fortune-qr-code {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+        .fortune-page .fortune-invite-link-box {
+          display: flex;
+          width: 100%;
+          min-height: 44px;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 8px 6px 12px;
+          border: 1px solid #edc7b9;
+          border-radius: 12px;
+          background: #fffaf4;
+          color: #74372c;
+          font-size: 12px;
+        }
+        .fortune-page .fortune-invite-link-box span {
+          min-width: 0;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .fortune-page .fortune-invite-link-box button {
+          display: grid;
+          width: 32px;
+          height: 32px;
+          flex: 0 0 auto;
+          place-items: center;
+          border-radius: 9px;
+          background: #f7d29a;
+          color: #74372c;
+        }
+        .fortune-page .fortune-invite-link-box svg,
+        .fortune-page .fortune-copy-invite svg {
+          width: 17px;
+          height: 17px;
+        }
+        .fortune-page .fortune-copy-invite {
+          display: flex;
+          width: 100%;
+          height: 44px;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 10px;
+          border-radius: 12px;
+          background: linear-gradient(180deg, #ff7654 0%, #dc2e20 100%);
+          color: white;
+          font-size: 15px;
+          font-weight: 800;
+          box-shadow: 0 4px 8px rgba(151, 47, 25, .22);
+        }
+        .fortune-page .fortune-social-title {
+          margin: 14px 0 8px;
+          color: #8e6b65;
+          font-size: 13px;
+          font-weight: 700;
+        }
+        .fortune-page .fortune-social-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+        .fortune-page .fortune-social-button {
+          display: grid;
+          width: 44px;
+          height: 44px;
+          place-items: center;
+          border-radius: 50%;
+          color: white;
+          box-shadow: 0 3px 7px rgba(76, 35, 24, .2);
+        }
+        .fortune-page .fortune-social-button svg {
+          width: 22px;
+          height: 22px;
+        }
+        .fortune-page .fortune-social-button.telegram { background: #229ed9; }
+        .fortune-page .fortune-social-button.whatsapp { background: #25d366; }
+        .fortune-page .fortune-social-button.facebook { background: #1877f2; }
+        .fortune-page .fortune-social-button.instagram {
+          background: linear-gradient(135deg, #feda75, #d62976 52%, #4f5bd5);
+        }
         .fortune-page .fortune-dialog-grid {
           display: grid;
           grid-template-columns: 78px 1fr 92px;
@@ -718,6 +913,10 @@ export default function CheckinPage() {
           z-index: 3;
           bottom: 20px;
           left: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
           width: 61%;
           height: 59px;
           border: 3px solid #ffe5b0;
@@ -728,6 +927,10 @@ export default function CheckinPage() {
           font-size: 21px;
           font-weight: 700;
           transform: translateX(-50%);
+        }
+        .fortune-page .fortune-dialog-close svg {
+          width: 18px;
+          height: 18px;
         }
         .fortune-page .fortune-result-overlay {
           position: fixed;
@@ -931,7 +1134,7 @@ export default function CheckinPage() {
             <span className="fortune-action-icon"><BarChart3 aria-hidden="true" /></span>
             <span>Classement</span>
           </button>
-          <button type="button" className="fortune-invite" onClick={() => navigate("/team")}>
+          <button type="button" className="fortune-invite" onClick={() => setModal("invite")}>
             <Share2 aria-hidden="true" />
             Inviter des amis
           </button>
@@ -980,14 +1183,52 @@ export default function CheckinPage() {
           aria-labelledby="fortune-modal-title"
           onClick={() => setModal(null)}
         >
-          <div className="fortune-dialog" onClick={(event) => event.stopPropagation()}>
+          <div className={`fortune-dialog ${modal === "invite" ? "fortune-invite-dialog" : ""}`} onClick={(event) => event.stopPropagation()}>
             <div className="fortune-dialog-top" aria-hidden="true" />
             <div className="fortune-medal" aria-hidden="true"><Gift /></div>
             <div className="fortune-dialog-body">
-              <h2 id="fortune-modal-title" className="sr-only">
-                {modal === "ranking" ? "Classement" : "Enregistrements"}
+              <h2 id="fortune-modal-title" className={modal === "invite" ? "fortune-invite-title" : "sr-only"}>
+                {modal === "ranking" ? "Classement" : modal === "records" ? "Enregistrements" : "Inviter des amis"}
               </h2>
-              {modal === "ranking" ? (
+              {modal === "invite" ? (
+                <div className="fortune-invite-content">
+                  <p className="fortune-invite-lead">
+                    Scannez ce QR code ou partagez votre lien pour inviter vos amis.
+                  </p>
+                  <div className="fortune-qr-shell">
+                    {inviteQrCode ? (
+                      <img src={inviteQrCode} alt="QR code du lien d'invitation" className="fortune-qr-code" />
+                    ) : (
+                      <Loader2 className="h-8 w-8 animate-spin text-[#bd3a1e]" aria-label="Génération du QR code" />
+                    )}
+                  </div>
+                  <div className="fortune-invite-link-box">
+                    <span title={inviteLink}>{inviteLink || "Chargement du lien..."}</span>
+                    <button type="button" onClick={copyInviteLink} aria-label="Copier le lien d'invitation">
+                      {inviteLinkCopied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+                    </button>
+                  </div>
+                  <button type="button" className="fortune-copy-invite" onClick={copyInviteLink}>
+                    {inviteLinkCopied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+                    {inviteLinkCopied ? "Lien copié" : "Copier le lien"}
+                  </button>
+                  <div className="fortune-social-title">Partager avec</div>
+                  <div className="fortune-social-row" aria-label="Réseaux sociaux">
+                    <button type="button" className="fortune-social-button telegram" onClick={() => shareInviteLink("telegram")} aria-label="Partager sur Telegram">
+                      <SiTelegram aria-hidden="true" />
+                    </button>
+                    <button type="button" className="fortune-social-button whatsapp" onClick={() => shareInviteLink("whatsapp")} aria-label="Partager sur WhatsApp">
+                      <SiWhatsapp aria-hidden="true" />
+                    </button>
+                    <button type="button" className="fortune-social-button facebook" onClick={() => shareInviteLink("facebook")} aria-label="Partager sur Facebook">
+                      <SiFacebook aria-hidden="true" />
+                    </button>
+                    <button type="button" className="fortune-social-button instagram" onClick={() => shareInviteLink("instagram")} aria-label="Copier pour Instagram">
+                      <SiInstagram aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              ) : modal === "ranking" ? (
                 <>
                   <div className="fortune-dialog-grid">
                     <span>Classement</span>
@@ -1046,8 +1287,9 @@ export default function CheckinPage() {
                 </div>
               )}
             </div>
-            <button type="button" className="fortune-dialog-close" onClick={() => setModal(null)}>
-              Fermer
+            <button type="button" className="fortune-dialog-close" onClick={() => setModal(null)} aria-label="Fermer la fenêtre">
+              <X aria-hidden="true" />
+              <span>Fermer</span>
             </button>
           </div>
         </div>
