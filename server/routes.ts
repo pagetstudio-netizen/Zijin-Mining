@@ -454,9 +454,10 @@ export async function registerRoutes(
   app.post("/api/fortune/spin", requireAuth, async (req, res) => {
     try {
       const userId = req.session.userId!;
+      const wheelIndex = Math.floor(Math.random() * FORTUNE_REWARDS.length);
       const reward = Math.min(
         MAX_FORTUNE_REWARD,
-        FORTUNE_REWARDS[Math.floor(Math.random() * FORTUNE_REWARDS.length)],
+        FORTUNE_REWARDS[wheelIndex],
       );
       const spin = await storage.claimFortuneSpin(userId, reward);
 
@@ -482,7 +483,7 @@ export async function registerRoutes(
       });
 
       const remainingSpins = await storage.getAvailableFortuneSpinCount(userId);
-      res.json({ reward, remainingSpins });
+      res.json({ reward, remainingSpins, wheelIndex });
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Impossible de lancer la roue" });
     }

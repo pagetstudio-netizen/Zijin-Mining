@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type CSSProperties, useRef, useState } from "react";
 import { ArrowLeft, BarChart3, FileText, Gift, HelpCircle, Share2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -8,12 +8,17 @@ import { Loader2 } from "lucide-react";
 
 type FortuneModal = "ranking" | "records" | null;
 type FortuneStatus = { remainingSpins: number };
-type FortuneSpinResult = { reward: number; remainingSpins: number };
+type FortuneSpinResult = { reward: number; remainingSpins: number; wheelIndex: number };
 type FortuneRecord = {
   id: number;
   reward: number | null;
   createdAt: string;
   usedAt: string | null;
+};
+type FortuneOutcome = {
+  won: boolean;
+  reward: number | null;
+  message: string;
 };
 
 const wheelValues = ["5", "10", "30", "100", "300", "1000", "2000", "5000"];
@@ -32,6 +37,10 @@ export default function CheckinPage() {
   const [modal, setModal] = useState<FortuneModal>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [lastReward, setLastReward] = useState<number | null>(null);
+  const [wheelRotation, setWheelRotation] = useState(1800);
+  const [fortuneOutcome, setFortuneOutcome] = useState<FortuneOutcome | null>(null);
+  const spinRequestLocked = useRef(false);
+  const spinDuration = 3400;
 
   const {
     data: fortuneStatus,
@@ -48,6 +57,10 @@ export default function CheckinPage() {
 
   const remainingSpins = fortuneStatus?.remainingSpins ?? 0;
 
+  const showLossPopup = (message: string) => {
+    setFortuneOutcome({ won: false, reward: null, message });
+  };
+
   const spinMutation = useMutation<FortuneSpinResult, Error, void>({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/fortune/spin", {});
@@ -58,52 +71,60 @@ export default function CheckinPage() {
       return response.json();
     },
     onSuccess: (data) => {
+      const safeWheelIndex = Math.max(0, Math.min(wheelValues.length - 1, Math.floor(data.wheelIndex)));
+      const targetRotation = (5 * 360) + ((360 - safeWheelIndex * 45) % 360);
+      setWheelRotation(targetRotation);
       setLastReward(data.reward);
       queryClient.setQueryData(["/api/fortune/status"], {
         remainingSpins: data.remainingSpins,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/fortune/records"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      toast({
-        title: "Félicitations !",
-        description: `Vous avez gagné ${data.reward.toLocaleString("fr-FR")} FCFA.`,
-      });
-      window.setTimeout(() => setIsSpinning(false), 1300);
+      setIsSpinning(true);
+      window.setTimeout(() => {
+        setIsSpinning(false);
+        spinRequestLocked.current = false;
+        if (data.reward > 0) {
+          setFortuneOutcome({
+            won: true,
+            reward: data.reward,
+            message: "Votre gain a été crédité sur votre solde.",
+          });
+        } else {
+          showLossPopup("Aucun gain n’a été crédité pour ce tirage.");
+        }
+      }, spinDuration);
     },
     onError: (error) => {
       setIsSpinning(false);
-      toast({
-        title: "Aucun tour disponible",
-        description: error.message,
-        variant: "destructive",
-      });
+      spinRequestLocked.current = false;
+      showLossPopup(error.message || "Le tirage n’a pas pu être effectué.");
     },
   });
 
   const showNoDrawsMessage = () => {
-    toast({
-      title: "Aucun tour disponible",
-      description: `Nombre de tours restants : ${remainingSpins}. Invitez un ami à s'inscrire pour recevoir un tour gratuit.`,
-    });
+    showLossPopup(`Nombre de tours restants : ${remainingSpins}. Obtenez un tour pour rejouer.`);
   };
 
   const handleSpin = () => {
-    if (loadingFortuneStatus || isSpinning || spinMutation.isPending) return;
+    if (spinRequestLocked.current || isSpinning || spinMutation.isPending) return false;
+    if (loadingFortuneStatus) {
+      showLossPopup("Le nombre de tours est encore en cours de chargement.");
+      return false;
+    }
     if (fortuneStatusError) {
-      toast({
-        title: "Erreur de chargement",
-        description: "Actualisez la page puis réessayez.",
-        variant: "destructive",
-      });
-      return;
+      showLossPopup("Actualisez la page puis réessayez.");
+      return false;
     }
     if (remainingSpins <= 0) {
       showNoDrawsMessage();
-      return;
+      return false;
     }
     setLastReward(null);
-    setIsSpinning(true);
+    setFortuneOutcome(null);
+    spinRequestLocked.current = true;
     spinMutation.mutate();
+    return true;
   };
 
   return (
@@ -266,12 +287,12 @@ export default function CheckinPage() {
           transform: translateX(-50%);
         }
         .fortune-page .fortune-wheel.is-spinning {
-          animation: fortune-wheel-spin 1.3s cubic-bezier(.12, .72, .18, 1);
+          animation: fortune-wheel-spin 3.4s cubic-bezier(.12, .72, .18, 1) forwards;
           will-change: transform;
         }
         @keyframes fortune-wheel-spin {
           from { transform: translateX(-50%) rotate(0deg); }
-          to { transform: translateX(-50%) rotate(1440deg); }
+          to { transform: translateX(-50%) rotate(var(--fortune-rotation, 1800deg)); }
         }
         .fortune-page .fortune-wheel::before {
           position: absolute;
@@ -353,6 +374,7 @@ export default function CheckinPage() {
           text-shadow: 0 2px 1px rgba(147, 48, 25, .35);
           transform: translate(-50%, -50%);
           z-index: 2;
+          touch-action: manipulation;
         }
         .fortune-page .fortune-go:disabled {
           cursor: wait;
@@ -665,6 +687,82 @@ export default function CheckinPage() {
           font-weight: 700;
           transform: translateX(-50%);
         }
+        .fortune-page .fortune-result-overlay {
+          position: fixed;
+          z-index: 70;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          background: rgba(76, 25, 17, .72);
+        }
+        .fortune-page .fortune-result-card {
+          width: min(100%, 360px);
+          padding: 34px 24px 24px;
+          border: 5px solid #ffd889;
+          border-radius: 30px;
+          background: linear-gradient(180deg, #fffdf0 0%, #fff0bd 100%);
+          box-shadow: 0 16px 34px rgba(55, 20, 9, .42);
+          color: #5a241a;
+          text-align: center;
+          animation: fortune-result-pop .28s ease-out;
+        }
+        .fortune-page .fortune-result-card.is-loss {
+          border-color: #ffb39f;
+          background: linear-gradient(180deg, #fff9f5 0%, #ffe1d8 100%);
+        }
+        @keyframes fortune-result-pop {
+          from { opacity: 0; transform: scale(.82) translateY(12px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .fortune-page .fortune-result-badge {
+          display: grid;
+          width: 76px;
+          height: 76px;
+          place-items: center;
+          margin: -67px auto 13px;
+          border: 6px solid #fff3be;
+          border-radius: 50%;
+          background: linear-gradient(145deg, #ffc943, #e87816);
+          color: white;
+          font-size: 48px;
+          font-weight: 900;
+          line-height: 1;
+          box-shadow: 0 6px 12px rgba(159, 75, 17, .3);
+        }
+        .fortune-page .fortune-result-card.is-loss .fortune-result-badge {
+          border-color: #ffe4dc;
+          background: linear-gradient(145deg, #ff9b83, #d94332);
+        }
+        .fortune-page .fortune-result-card h2 {
+          margin: 0;
+          font-size: 27px;
+          font-weight: 900;
+        }
+        .fortune-page .fortune-result-amount {
+          margin: 14px 0 4px;
+          color: #c22e1d;
+          font-size: 32px;
+          font-weight: 900;
+        }
+        .fortune-page .fortune-result-message {
+          margin: 12px 0 22px;
+          color: #7a4a3e;
+          font-size: 15px;
+          line-height: 1.45;
+        }
+        .fortune-page .fortune-result-close {
+          width: 78%;
+          height: 52px;
+          border: 2px solid #ffe2a0;
+          border-radius: 999px;
+          background: linear-gradient(180deg, #ff7654 0%, #dc2e20 100%);
+          color: white;
+          font-size: 18px;
+          font-weight: 800;
+          box-shadow: 0 4px 8px rgba(151, 47, 25, .28);
+        }
         @media (max-width: 370px) {
           .fortune-page .fortune-header {
             height: 75px;
@@ -736,7 +834,10 @@ export default function CheckinPage() {
 
           <div className="fortune-wheel-area" aria-label="Roue de la fortune">
             <div className="fortune-wheel-glow" aria-hidden="true" />
-            <div className={`fortune-wheel ${isSpinning ? "is-spinning" : ""}`}>
+            <div
+              className={`fortune-wheel ${isSpinning ? "is-spinning" : ""}`}
+              style={{ "--fortune-rotation": `${wheelRotation}deg` } as CSSProperties}
+            >
               <span className="wheel-divider one" aria-hidden="true" />
               <span className="wheel-divider two" aria-hidden="true" />
               <span className="wheel-divider three" aria-hidden="true" />
@@ -770,8 +871,9 @@ export default function CheckinPage() {
                 type="button"
                 className="fortune-go"
                 onClick={handleSpin}
-                disabled={loadingFortuneStatus || fortuneStatusError || isSpinning || spinMutation.isPending}
+                disabled={isSpinning || spinMutation.isPending}
                 aria-label="Lancer le tirage"
+                data-testid="button-fortune-go"
               >
                 {spinMutation.isPending ? <Loader2 className="fortune-go-loader animate-spin" aria-hidden="true" /> : "GO"}
               </button>
@@ -900,6 +1002,41 @@ export default function CheckinPage() {
             </div>
             <button type="button" className="fortune-dialog-close" onClick={() => setModal(null)}>
               Fermer
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {fortuneOutcome ? (
+        <div
+          className="fortune-result-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fortune-result-title"
+          onClick={() => setFortuneOutcome(null)}
+        >
+          <div
+            className={`fortune-result-card ${fortuneOutcome.won ? "is-win" : "is-loss"}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="fortune-result-badge" aria-hidden="true">
+              {fortuneOutcome.won ? "✓" : "×"}
+            </div>
+            <h2 id="fortune-result-title">
+              {fortuneOutcome.won ? "Vous avez gagné !" : "Dommage, vous avez perdu"}
+            </h2>
+            {fortuneOutcome.won && fortuneOutcome.reward !== null ? (
+              <p className="fortune-result-amount">
+                {fortuneOutcome.reward.toLocaleString("fr-FR")} FCFA
+              </p>
+            ) : null}
+            <p className="fortune-result-message">{fortuneOutcome.message}</p>
+            <button
+              type="button"
+              className="fortune-result-close"
+              onClick={() => setFortuneOutcome(null)}
+            >
+              Continuer
             </button>
           </div>
         </div>
