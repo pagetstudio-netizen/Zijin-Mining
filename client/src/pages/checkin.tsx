@@ -601,7 +601,7 @@ export default function CheckinPage() {
         .fortune-page .fortune-dialog {
           position: relative;
           width: min(100%, 438px);
-          height: min(620px, calc(100vh - 48px));
+          height: min(560px, calc(100vh - 48px));
           min-height: 0;
           max-height: calc(100vh - 48px);
           display: flex;
@@ -681,14 +681,14 @@ export default function CheckinPage() {
           padding: 79px 23px 91px;
         }
         .fortune-page .fortune-invite-dialog {
-          height: auto;
+          height: min(560px, calc(100vh - 48px));
           max-height: calc(100vh - 48px);
         }
         .fortune-page .fortune-invite-dialog .fortune-dialog-body {
-          flex: 0 1 auto;
+          flex: 1;
           overflow-y: auto;
           overscroll-behavior: contain;
-          padding: 76px 23px 91px;
+          padding: 64px 20px 82px;
         }
         .fortune-page .fortune-help-dialog .fortune-dialog-body {
           overflow: hidden;
@@ -753,8 +753,8 @@ export default function CheckinPage() {
         }
         .fortune-page .fortune-qr-shell {
           display: grid;
-          width: 220px;
-          height: 220px;
+          width: 185px;
+          height: 185px;
           place-items: center;
           margin: 0 auto 14px;
           border: 8px solid white;
