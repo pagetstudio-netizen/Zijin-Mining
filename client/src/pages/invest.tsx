@@ -67,7 +67,7 @@ export default function InvestPage() {
 
   if (!user) return null;
 
-  const balance     = parseFloat(user.balance || "0");
+  const depositBalance = parseFloat(user.depositBalance || "0");
   const country     = getCountryByCode(user.country);
   const currency    = country?.currency || "FCFA";
   const paidProducts = products?.filter(p => !p.isFree) || [];
@@ -193,7 +193,7 @@ export default function InvestPage() {
       {confirmProduct && (() => {
         const prodIdx   = (products?.findIndex(p => p.id === confirmProduct.id) ?? 0);
         const prodImg   = PRODUCT_IMAGES[prodIdx % PRODUCT_IMAGES.length];
-        const shortage  = confirmProduct.price - balance;
+        const shortage  = confirmProduct.price - depositBalance;
         const daily     = Number(confirmProduct.dailyIncome  || 0);
         const total     = Number(confirmProduct.totalReturn  || daily * Number(confirmProduct.cycleDays || 90));
         const duration  = Number(confirmProduct.cycleDays || 90);

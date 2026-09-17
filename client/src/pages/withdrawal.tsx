@@ -131,7 +131,7 @@ export default function WithdrawalPage() {
 
   if (!user) return null;
 
-  const balance = parseFloat(user?.balance || "0");
+  const withdrawalBalance = parseFloat(user?.withdrawalBalance || "0");
   const hasWallets = wallets.length > 0;
 
   return (
@@ -384,8 +384,8 @@ export default function WithdrawalPage() {
             <button className="withdraw-back" data-testid="button-back" aria-label="Retour" />
           </Link>
           <div className="balance-card">
-            <p className="balance-label">Solde du compte</p>
-            <p className="balance-value" data-testid="text-balance">{Math.round(balance).toLocaleString("fr-FR")}<span>{currency}</span></p>
+            <p className="balance-label">Solde de retrait</p>
+            <p className="balance-value" data-testid="text-balance">{Math.round(withdrawalBalance).toLocaleString("fr-FR")}<span>{currency}</span></p>
             <div className="wallet-mark" aria-hidden="true"><img src={walletIcon} alt="" /></div>
           </div>
         </section>

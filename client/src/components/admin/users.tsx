@@ -118,7 +118,8 @@ export default function AdminUsers({ isSuperAdmin }: AdminUsersProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<"all" | "banned" | "blocked" | "promoter">("all");
   const [selectedUser, setSelectedUser] = useState<UserWithTeam | null>(null);
-  const [editBalance, setEditBalance] = useState("");
+  const [editDepositBalance, setEditDepositBalance] = useState("");
+  const [editWithdrawalBalance, setEditWithdrawalBalance] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [showTeamModal, setShowTeamModal] = useState(false);
@@ -308,10 +309,14 @@ export default function AdminUsers({ isSuperAdmin }: AdminUsersProps) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-sm">
+                <div className="grid grid-cols-4 gap-2 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Solde</p>
-                    <p className="font-medium text-foreground">{formatCurrency(parseFloat(user.balance), user.country)}</p>
+                    <p className="text-muted-foreground">Retrait</p>
+                    <p className="font-medium text-foreground">{formatCurrency(parseFloat(user.withdrawalBalance || "0"), user.country)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Dépôt</p>
+                    <p className="font-medium text-foreground">{formatCurrency(parseFloat(user.depositBalance || "0"), user.country)}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Equipe</p>
@@ -478,21 +483,40 @@ export default function AdminUsers({ isSuperAdmin }: AdminUsersProps) {
               </div>
 
               <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium">Modifier le solde</label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="number"
-                      value={editBalance}
-                      onChange={(e) => setEditBalance(e.target.value)}
-                      placeholder="Nouveau solde"
-                    />
-                    <Button
-                      onClick={() => updateMutation.mutate({ userId: selectedUser.id, action: "balance", value: parseFloat(editBalance) })}
-                      disabled={updateMutation.isPending || !editBalance}
-                    >
-                      {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "OK"}
-                    </Button>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium">Solde de dépôt</label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        type="number"
+                        value={editDepositBalance}
+                        onChange={(e) => setEditDepositBalance(e.target.value)}
+                        placeholder={selectedUser.depositBalance || "0"}
+                      />
+                      <Button
+                        onClick={() => updateMutation.mutate({ userId: selectedUser.id, action: "deposit-balance", value: parseFloat(editDepositBalance) })}
+                        disabled={updateMutation.isPending || !editDepositBalance}
+                      >
+                        {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "OK"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Solde de retrait</label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        type="number"
+                        value={editWithdrawalBalance}
+                        onChange={(e) => setEditWithdrawalBalance(e.target.value)}
+                        placeholder={selectedUser.withdrawalBalance || "0"}
+                      />
+                      <Button
+                        onClick={() => updateMutation.mutate({ userId: selectedUser.id, action: "balance", value: parseFloat(editWithdrawalBalance) })}
+                        disabled={updateMutation.isPending || !editWithdrawalBalance}
+                      >
+                        {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "OK"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

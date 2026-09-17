@@ -165,7 +165,13 @@ app.use((req, res, next) => {
               const user = await storage.getUser(deposit.userId);
               if (user) {
                 await storage.updateUser(user.id, {
-                  balance: (parseFloat(user.balance) + deposit.amount).toFixed(2),
+                  depositBalance: (parseFloat(user.depositBalance || "0") + deposit.amount).toFixed(2),
+                  withdrawalBalance: parseFloat(user.withdrawalBalance || "0").toFixed(2),
+                  balance: (
+                    parseFloat(user.depositBalance || "0") +
+                    parseFloat(user.withdrawalBalance || "0") +
+                    deposit.amount
+                  ).toFixed(2),
                   hasDeposited: true,
                 });
                 await storage.createTransaction({

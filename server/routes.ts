@@ -65,6 +65,17 @@ import express from "express";
 const FORTUNE_REWARDS = [5, 10, 30, 100, 300, 1000, 2000, 5000];
 const MAX_FORTUNE_REWARD = 500;
 
+function walletBalanceFields(
+  depositBalance: number,
+  withdrawalBalance: number,
+) {
+  return {
+    depositBalance: depositBalance.toFixed(2),
+    withdrawalBalance: withdrawalBalance.toFixed(2),
+    balance: (depositBalance + withdrawalBalance).toFixed(2),
+  };
+}
+
 // --- Brute-force protection (in-memory) ---
 const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -157,7 +168,10 @@ async function creditApprovedDeposit(deposit: { id: number; userId: number; amou
   if (!user) return;
 
   await storage.updateUser(user.id, {
-    balance: (parseFloat(user.balance) + deposit.amount).toFixed(2),
+    ...walletBalanceFields(
+      parseFloat(user.depositBalance || "0") + deposit.amount,
+      parseFloat(user.withdrawalBalance || "0"),
+    ),
     hasDeposited: true,
   });
   await storage.createTransaction({
@@ -473,8 +487,10 @@ export async function registerRoutes(
         return res.status(401).json({ message: "Non authentifié" });
       }
 
-      const newBalance = (parseFloat(user.balance) + reward).toFixed(2);
-      await storage.updateUser(userId, { balance: newBalance });
+      await storage.updateUser(userId, walletBalanceFields(
+        parseFloat(user.depositBalance || "0"),
+        parseFloat(user.withdrawalBalance || "0") + reward,
+      ));
       await storage.createTransaction({
         userId,
         type: "fortune_reward",
@@ -593,9 +609,11 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Déjà réclamé aujourd'hui" });
       }
 
-      const newBalance = parseFloat(user.balance) + product.dailyEarnings;
       await storage.updateUser(user.id, { 
-        balance: newBalance.toFixed(2),
+        ...walletBalanceFields(
+          parseFloat(user.depositBalance || "0") + product.dailyEarnings,
+          parseFloat(user.withdrawalBalance || "0"),
+        ),
         lastFreeProductClaim: new Date(),
       });
 
@@ -702,12 +720,14 @@ export async function registerRoutes(
       if (totalCollected > 0) {
         const freshUser = await storage.getUser(userId);
         if (freshUser) {
-          const newBalance = parseFloat(freshUser.balance || "0") + totalCollected;
           const newTodayEarnings = parseFloat(freshUser.todayEarnings || "0") + totalCollected;
           const newTotalEarnings = parseFloat(freshUser.totalEarnings || "0") + totalCollected;
 
           await storage.updateUser(userId, {
-            balance: newBalance.toFixed(2),
+            ...walletBalanceFields(
+              parseFloat(freshUser.depositBalance || "0"),
+              parseFloat(freshUser.withdrawalBalance || "0") + totalCollected,
+            ),
             todayEarnings: newTodayEarnings.toFixed(2),
             totalEarnings: newTotalEarnings.toFixed(2),
           });
@@ -719,7 +739,7 @@ export async function registerRoutes(
         success: true, 
         collected: totalCollected,
         productsCollected,
-        newBalance: updatedUser?.balance || "0"
+        newBalance: updatedUser?.withdrawalBalance || "0"
       });
     } catch (error: any) {
       console.error("Collect earnings error:", error);
@@ -1290,9 +1310,11 @@ export async function registerRoutes(
             if (newStatus === "approved") {
               const user = await storage.getUser(deposit.userId);
               if (user) {
-                const newBalance = parseFloat(user.balance) + deposit.amount;
                 await storage.updateUser(deposit.userId, {
-                  balance: newBalance.toFixed(2),
+                  ...walletBalanceFields(
+                    parseFloat(user.depositBalance || "0") + deposit.amount,
+                    parseFloat(user.withdrawalBalance || "0"),
+                  ),
                   hasDeposited: true,
                 });
 
@@ -1310,7 +1332,10 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
   const user = await storage.getUser(withdrawal.userId);
   if (!user) return;
   await storage.updateUser(user.id, {
-    balance: (parseFloat(user.balance) + withdrawal.amount).toFixed(2),
+    ...walletBalanceFields(
+      parseFloat(user.depositBalance || "0"),
+      parseFloat(user.withdrawalBalance || "0") + withdrawal.amount,
+    ),
   });
   await storage.createTransaction({
     userId: user.id,
@@ -1533,7 +1558,10 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
             const user = await storage.getUser(deposit.userId);
             if (user) {
               await storage.updateUser(user.id, {
-                balance: (parseFloat(user.balance) + deposit.amount).toFixed(2),
+                ...walletBalanceFields(
+                  parseFloat(user.depositBalance || "0") + deposit.amount,
+                  parseFloat(user.withdrawalBalance || "0"),
+                ),
                 hasDeposited: true,
               });
               await storage.createTransaction({
@@ -2002,9 +2030,9 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
         }
       }
 
-      const balance = parseFloat(user.balance);
-      if (amount > balance) {
-        return res.status(400).json({ message: "Solde insuffisant" });
+      const withdrawalBalance = parseFloat(user.withdrawalBalance || "0");
+      if (amount > withdrawalBalance) {
+        return res.status(400).json({ message: "Solde de retrait insuffisant" });
       }
 
       const wallet = await storage.getDefaultWallet(user.id);
@@ -2024,9 +2052,12 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
       const feeAmount = Math.round(amount * fees / 100);
       const netAmount = amount - feeAmount;
 
-      // Deduct from balance
+      // Only the withdrawable wallet can be used for withdrawals.
       await storage.updateUser(user.id, {
-        balance: (balance - amount).toFixed(2),
+        ...walletBalanceFields(
+          parseFloat(user.depositBalance || "0"),
+          withdrawalBalance - amount,
+        ),
       });
 
       const withdrawal = await storage.createWithdrawal({
@@ -2174,9 +2205,11 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
       }
 
       // Add 50 FCFA to balance
-      const newBalance = parseFloat(user.balance) + 50;
       await storage.updateUser(user.id, { 
-        balance: newBalance.toString(),
+        ...walletBalanceFields(
+          parseFloat(user.depositBalance || "0") + 50,
+          parseFloat(user.withdrawalBalance || "0"),
+        ),
         lastDailyBonusClaim: now
       });
 
@@ -2351,9 +2384,11 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
 
       const user = await storage.getUser(deposit.userId);
       if (user) {
-        const newBalance = parseFloat(user.balance) + deposit.amount;
         await storage.updateUser(user.id, { 
-          balance: newBalance.toFixed(2),
+          ...walletBalanceFields(
+            parseFloat(user.depositBalance || "0") + deposit.amount,
+            parseFloat(user.withdrawalBalance || "0"),
+          ),
           hasDeposited: true,
         });
         
@@ -2469,8 +2504,10 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
       // Refund the user
       const user = await storage.getUser(withdrawal.userId);
       if (user) {
-        const newBalance = parseFloat(user.balance) + withdrawal.amount;
-        await storage.updateUser(user.id, { balance: newBalance.toFixed(2) });
+        await storage.updateUser(user.id, walletBalanceFields(
+          parseFloat(user.depositBalance || "0"),
+          parseFloat(user.withdrawalBalance || "0") + withdrawal.amount,
+        ));
       }
 
       await storage.logAdminAction(req.session.userId!, "reject_withdrawal", withdrawal.userId, `Retrait ${withdrawal.id} rejeté et remboursé`);
@@ -2573,8 +2610,26 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
 
       switch (action) {
         case "balance":
-          await storage.updateUser(userId, { balance: value.toFixed(2) });
-          await storage.logAdminAction(req.session.userId!, "update_balance", userId, `Solde modifié: ${value}F`);
+          {
+            const targetUser = await storage.getUser(userId);
+            if (!targetUser) throw new Error("Utilisateur non trouvé");
+            await storage.updateUser(userId, walletBalanceFields(
+              parseFloat(targetUser.depositBalance || "0"),
+              value,
+            ));
+            await storage.logAdminAction(req.session.userId!, "update_withdrawal_balance", userId, `Solde de retrait modifié: ${value}F`);
+          }
+          break;
+        case "deposit-balance":
+          {
+            const targetUser = await storage.getUser(userId);
+            if (!targetUser) throw new Error("Utilisateur non trouvé");
+            await storage.updateUser(userId, walletBalanceFields(
+              value,
+              parseFloat(targetUser.withdrawalBalance || "0"),
+            ));
+            await storage.logAdminAction(req.session.userId!, "update_deposit_balance", userId, `Solde de dépôt modifié: ${value}F`);
+          }
           break;
         case "password":
           await storage.updateUser(userId, { password: value });
@@ -3144,8 +3199,13 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
       });
       const user = await storage.getUser(deposit.userId);
       if (user) {
-        const newBalance = parseFloat(user.balance) + deposit.amount;
-        await storage.updateUser(user.id, { balance: newBalance.toFixed(2), hasDeposited: true });
+        await storage.updateUser(user.id, {
+          ...walletBalanceFields(
+            parseFloat(user.depositBalance || "0") + deposit.amount,
+            parseFloat(user.withdrawalBalance || "0"),
+          ),
+          hasDeposited: true,
+        });
         await storage.createTransaction({ userId: user.id, type: "deposit", amount: deposit.amount.toString(), description: "Dépôt validé par bankier" });
       }
       await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé par bankier: ${deposit.amount}F`);
@@ -3196,8 +3256,10 @@ async function refundRejectedWithdrawal(withdrawal: { id: number; userId: number
       });
       const user = await storage.getUser(withdrawal.userId);
       if (user) {
-        const newBalance = parseFloat(user.balance) + withdrawal.amount;
-        await storage.updateUser(user.id, { balance: newBalance.toFixed(2) });
+        await storage.updateUser(user.id, walletBalanceFields(
+          parseFloat(user.depositBalance || "0"),
+          parseFloat(user.withdrawalBalance || "0") + withdrawal.amount,
+        ));
       }
       await storage.logAdminAction(req.session.userId!, "reject_withdrawal", withdrawal.userId, `Retrait ${withdrawal.id} rejeté par bankier et remboursé`);
       res.json(withdrawal);

@@ -57,8 +57,8 @@ export default function AccountPage() {
 
   const country = getCountryByCode(user.country);
   const currency = country?.currency || "XOF";
-  const balance = Number.parseFloat(user.balance || "0");
-  const earnings = Number.parseFloat(user.totalEarnings || "0");
+  const withdrawalBalance = Number.parseFloat(user.withdrawalBalance || "0");
+  const depositBalance = Number.parseFloat(user.depositBalance || "0");
   const phonePrefix = country?.phonePrefix || "";
   const formatAmount = (amount: number) => `${Math.round(amount).toLocaleString("fr-FR")} ${currency}`;
 
@@ -375,12 +375,12 @@ export default function AccountPage() {
           </div>
           <section className="account-summaries" aria-label="Résumé du compte">
             <article className="summary balance">
-              <p className="summary-amount">{formatAmount(balance)}</p>
-              <p className="summary-label">Solde</p>
+              <p className="summary-amount">{formatAmount(withdrawalBalance)}</p>
+              <p className="summary-label">Solde de retrait</p>
             </article>
             <article className="summary earnings">
-              <p className="summary-amount">{formatAmount(earnings)}</p>
-              <p className="summary-label">Revenu</p>
+              <p className="summary-amount">{formatAmount(depositBalance)}</p>
+              <p className="summary-label">Solde de dépôt</p>
             </article>
           </section>
         </section>

@@ -24,6 +24,20 @@ export async function seed() {
   await db.execute(sql`
     ALTER TABLE "payment_numbers" ADD COLUMN IF NOT EXISTS "payment_link" text
   `).catch(() => undefined);
+  await db.execute(sql`
+    ALTER TABLE "users"
+      ADD COLUMN IF NOT EXISTS "deposit_balance" decimal(15,2) NOT NULL DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS "withdrawal_balance" decimal(15,2) NOT NULL DEFAULT 0
+  `).catch(() => undefined);
+  // Existing balances were historically withdrawable. Preserve them in the
+  // withdrawal wallet when introducing the two-wallet model.
+  await db.execute(sql`
+    UPDATE "users"
+    SET "withdrawal_balance" = "balance"
+    WHERE "deposit_balance" = 0
+      AND "withdrawal_balance" = 0
+      AND "balance" <> 0
+  `).catch(() => undefined);
 
   // Ensure countries table exists
   await db.execute(sql`

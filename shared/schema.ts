@@ -23,6 +23,9 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   referralCode: text("referral_code").notNull().unique(),
   referredBy: text("referred_by"),
+  depositBalance: decimal("deposit_balance", { precision: 15, scale: 2 }).notNull().default("0"),
+  withdrawalBalance: decimal("withdrawal_balance", { precision: 15, scale: 2 }).notNull().default("0"),
+  // Legacy aggregate kept for compatibility with older integrations.
   balance: decimal("balance", { precision: 15, scale: 2 }).notNull().default("200"),
   todayEarnings: decimal("today_earnings", { precision: 15, scale: 2 }).notNull().default("0"),
   totalEarnings: decimal("total_earnings", { precision: 15, scale: 2 }).notNull().default("0"),
@@ -333,6 +336,8 @@ export const referralCommissionsRelations = relations(referralCommissions, ({ on
 // Schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
+  depositBalance: true,
+  withdrawalBalance: true,
   balance: true,
   todayEarnings: true,
   totalEarnings: true,

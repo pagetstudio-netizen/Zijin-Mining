@@ -10,6 +10,18 @@ import { db } from "./db";
  import { eq, and, desc, sql, gte, lte, or, isNull, isNotNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
+function formatBalance(value: number): string {
+  return value.toFixed(2);
+}
+
+function balanceFields(depositBalance: number, withdrawalBalance: number) {
+  return {
+    depositBalance: formatBalance(depositBalance),
+    withdrawalBalance: formatBalance(withdrawalBalance),
+    balance: formatBalance(depositBalance + withdrawalBalance),
+  };
+}
+
 export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
@@ -186,6 +198,8 @@ export class DatabaseStorage implements IStorage {
       ...data,
       password: hashedPassword,
       referralCode,
+      depositBalance: signupBonus,
+      withdrawalBalance: "0",
       balance: signupBonus,
     } as any).returning();
     
@@ -296,8 +310,8 @@ export class DatabaseStorage implements IStorage {
     if (!user) throw new Error("Utilisateur non trouvé");
 
     if (!product.isFree && !assignedByAdmin) {
-      const balance = parseFloat(user.balance);
-      if (balance < product.price) throw new Error("Solde insuffisant");
+      const depositBalance = parseFloat(user.depositBalance || "0");
+      if (depositBalance < product.price) throw new Error("Solde de dépôt insuffisant");
       
       // Check if this is user's first paid investment
       const existingPaidProducts = await db.select()
@@ -312,7 +326,7 @@ export class DatabaseStorage implements IStorage {
       const isFirstInvestment = existingPaidProducts.length === 0;
       
       await this.updateUser(userId, { 
-        balance: (balance - product.price).toFixed(2),
+        ...balanceFields(depositBalance - product.price, parseFloat(user.withdrawalBalance || "0")),
         hasActiveProduct: true,
       });
 
@@ -436,7 +450,10 @@ export class DatabaseStorage implements IStorage {
     if (level1User) {
       const commission = amount * level1Rate;
       await this.updateUser(level1User.id, {
-        balance: (parseFloat(level1User.balance) + commission).toFixed(2),
+        ...balanceFields(
+          parseFloat(level1User.depositBalance || "0"),
+          parseFloat(level1User.withdrawalBalance || "0") + commission,
+        ),
       });
       await this.createReferralCommission({
         userId: level1User.id,
@@ -458,7 +475,10 @@ export class DatabaseStorage implements IStorage {
         if (level2User) {
           const commission2 = amount * level2Rate;
           await this.updateUser(level2User.id, {
-            balance: (parseFloat(level2User.balance) + commission2).toFixed(2),
+            ...balanceFields(
+              parseFloat(level2User.depositBalance || "0"),
+              parseFloat(level2User.withdrawalBalance || "0") + commission2,
+            ),
           });
           await this.createReferralCommission({
             userId: level2User.id,
@@ -480,7 +500,10 @@ export class DatabaseStorage implements IStorage {
             if (level3User) {
               const commission3 = amount * level3Rate;
               await this.updateUser(level3User.id, {
-                balance: (parseFloat(level3User.balance) + commission3).toFixed(2),
+                ...balanceFields(
+                  parseFloat(level3User.depositBalance || "0"),
+                  parseFloat(level3User.withdrawalBalance || "0") + commission3,
+                ),
               });
               await this.createReferralCommission({
                 userId: level3User.id,
@@ -570,12 +593,13 @@ export class DatabaseStorage implements IStorage {
       try {
         const freshUser = await this.getUser(userId);
         if (freshUser) {
-          const newBalance = parseFloat(freshUser.balance || "0") + totalEarnings;
+          const depositBalance = parseFloat(freshUser.depositBalance || "0");
+          const withdrawalBalance = parseFloat(freshUser.withdrawalBalance || "0") + totalEarnings;
           const newTodayEarnings = parseFloat(freshUser.todayEarnings || "0") + totalEarnings;
           const newTotalEarnings = parseFloat(freshUser.totalEarnings || "0") + totalEarnings;
           
           await this.updateUser(userId, {
-            balance: newBalance.toFixed(2),
+            ...balanceFields(depositBalance, withdrawalBalance),
             todayEarnings: newTodayEarnings.toFixed(2),
             totalEarnings: newTotalEarnings.toFixed(2),
           });
@@ -706,7 +730,10 @@ export class DatabaseStorage implements IStorage {
       const commission = Math.round(amount * level1Rate);
       if (commission > 0) {
         await this.updateUser(level1User.id, {
-          balance: (parseFloat(level1User.balance) + commission).toFixed(2),
+          ...balanceFields(
+            parseFloat(level1User.depositBalance || "0"),
+            parseFloat(level1User.withdrawalBalance || "0") + commission,
+          ),
         });
         await this.createTransaction({
           userId: level1User.id,
@@ -722,7 +749,10 @@ export class DatabaseStorage implements IStorage {
           const comm2 = Math.round(amount * level2Rate);
           if (comm2 > 0) {
             await this.updateUser(level2User.id, {
-              balance: (parseFloat(level2User.balance) + comm2).toFixed(2),
+              ...balanceFields(
+                parseFloat(level2User.depositBalance || "0"),
+                parseFloat(level2User.withdrawalBalance || "0") + comm2,
+              ),
             });
             await this.createTransaction({
               userId: level2User.id,
@@ -738,7 +768,10 @@ export class DatabaseStorage implements IStorage {
               const comm3 = Math.round(amount * level3Rate);
               if (comm3 > 0) {
                 await this.updateUser(level3User.id, {
-                  balance: (parseFloat(level3User.balance) + comm3).toFixed(2),
+                  ...balanceFields(
+                    parseFloat(level3User.depositBalance || "0"),
+                    parseFloat(level3User.withdrawalBalance || "0") + comm3,
+                  ),
                 });
                 await this.createTransaction({
                   userId: level3User.id,
@@ -1069,7 +1102,9 @@ export class DatabaseStorage implements IStorage {
         fullName: user.fullName,
         phone: user.phone,
         country: user.country,
-        balance: user.balance,
+        balance: formatBalance(
+          parseFloat(user.depositBalance || "0") + parseFloat(user.withdrawalBalance || "0"),
+        ),
         hasActiveProduct: user.hasActiveProduct,
         hasDeposited: user.hasDeposited,
         createdAt: user.createdAt,
@@ -1159,8 +1194,8 @@ export class DatabaseStorage implements IStorage {
 
     await db.insert(userTasks).values({ userId, taskId });
     
-    const newBalance = parseFloat(user.balance) + taskStatus.reward;
-    await this.updateUser(userId, { balance: newBalance.toFixed(2) });
+    const depositBalance = parseFloat(user.depositBalance || "0") + taskStatus.reward;
+    await this.updateUser(userId, balanceFields(depositBalance, parseFloat(user.withdrawalBalance || "0")));
     
     await this.createTransaction({
       userId,
@@ -1250,7 +1285,7 @@ export class DatabaseStorage implements IStorage {
     const baselineEarnings = parseFloat(await this.getSetting("baselineTotalEarnings") || "0");
     const baselineCommissions = parseFloat(await this.getSetting("baselineTotalCommissions") || "0");
     
-    const [totalBalanceResult] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.balance} AS DECIMAL)), 0)` })
+    const [totalBalanceResult] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.depositBalance} AS DECIMAL) + CAST(${users.withdrawalBalance} AS DECIMAL)), 0)` })
       .from(users);
     
     const [totalEarningsResult] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.totalEarnings} AS DECIMAL)), 0)` })
@@ -1298,7 +1333,7 @@ export class DatabaseStorage implements IStorage {
     await this.setSetting("statsResetDate", new Date().toISOString());
     
     // Stocker les valeurs baseline pour les compteurs cumulatifs (solde et gains)
-    const [currentBalance] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.balance} AS DECIMAL)), 0)` }).from(users);
+    const [currentBalance] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.depositBalance} AS DECIMAL) + CAST(${users.withdrawalBalance} AS DECIMAL)), 0)` }).from(users);
     const [currentEarnings] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(${users.totalEarnings} AS DECIMAL)), 0)` }).from(users);
     const [currentCommissions] = await db.select({ total: sql<string>`COALESCE(SUM(CAST(amount AS DECIMAL)), 0)` }).from(transactions).where(eq(transactions.type, "commission"));
     
@@ -1342,7 +1377,8 @@ export class DatabaseStorage implements IStorage {
         currentUses: sql`${giftCodes.currentUses} + 1`
       }).where(eq(giftCodes.id, giftCodeId));
       await tx.update(users).set({
-        balance: sql`${users.balance} + ${amount}`
+        depositBalance: sql`${users.depositBalance} + ${amount}`,
+        balance: sql`${users.balance} + ${amount}`,
       }).where(eq(users.id, userId));
       await tx.insert(transactions).values({
         userId,
@@ -1453,8 +1489,9 @@ export class DatabaseStorage implements IStorage {
 
     const user = await this.getUser(userId);
     if (!user) throw new Error("Utilisateur introuvable");
-    if (parseFloat(user.balance) < sp.price) {
-      throw new Error(`Solde insuffisant. Il vous manque ${(sp.price - parseFloat(user.balance)).toLocaleString()} ${user.country === "TD" ? "XAF" : "XOF"}`);
+    const depositBalance = parseFloat(user.depositBalance || "0");
+    if (depositBalance < sp.price) {
+      throw new Error(`Solde de dépôt insuffisant. Il vous manque ${(sp.price - depositBalance).toLocaleString()} ${user.country === "TD" ? "XAF" : "XOF"}`);
     }
 
     // Check user has at least one active regular product
@@ -1477,8 +1514,10 @@ export class DatabaseStorage implements IStorage {
     }).returning();
 
     // Deduct balance
-    const newBalance = (parseFloat(user.balance) - sp.price).toFixed(2);
-    await this.updateUser(userId, { balance: newBalance });
+    await this.updateUser(userId, balanceFields(
+      depositBalance - sp.price,
+      parseFloat(user.withdrawalBalance || "0"),
+    ));
 
     await this.createTransaction({
       userId,
@@ -1517,8 +1556,10 @@ export class DatabaseStorage implements IStorage {
       try {
         const user = await this.getUser(staking.userId);
         if (!user) continue;
-        const newBalance = (parseFloat(user.balance) + staking.returnAmount).toFixed(2);
-        await this.updateUser(staking.userId, { balance: newBalance });
+        await this.updateUser(staking.userId, balanceFields(
+          parseFloat(user.depositBalance || "0"),
+          parseFloat(user.withdrawalBalance || "0") + staking.returnAmount,
+        ));
         await db.update(userStakings)
           .set({ status: "released", releasedAt: now })
           .where(eq(userStakings.id, staking.id));
