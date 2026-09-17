@@ -9,7 +9,7 @@ import { SiFacebook, SiInstagram, SiTelegram, SiWhatsapp } from "react-icons/si"
 import { toDataURL as generateQrCode } from "qrcode";
 import { useAuth } from "@/lib/auth";
 
-type FortuneModal = "ranking" | "records" | "invite" | null;
+type FortuneModal = "ranking" | "records" | "invite" | "help" | null;
 type FortuneStatus = { remainingSpins: number };
 type FortuneSpinResult = { reward: number; remainingSpins: number; wheelIndex: number };
 type FortuneRecord = {
@@ -690,6 +690,47 @@ export default function CheckinPage() {
           overscroll-behavior: contain;
           padding: 76px 23px 91px;
         }
+        .fortune-page .fortune-help-dialog .fortune-dialog-body {
+          overflow: hidden;
+          padding: 76px 23px 91px;
+        }
+        .fortune-page .fortune-help-scroll {
+          height: 100%;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          padding-right: 6px;
+          scrollbar-color: #d78a55 #fff1f4;
+          scrollbar-width: thin;
+        }
+        .fortune-page .fortune-help-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .fortune-page .fortune-help-scroll::-webkit-scrollbar-thumb {
+          border-radius: 999px;
+          background: #d78a55;
+        }
+        .fortune-page .fortune-help-scroll::-webkit-scrollbar-track {
+          background: #fff1f4;
+        }
+        .fortune-page .fortune-help-title {
+          margin: 0 0 16px;
+          color: #74372c;
+          font-size: 24px;
+          font-weight: 900;
+          line-height: 1.15;
+          text-align: center;
+        }
+        .fortune-page .fortune-help-copy {
+          color: #5f4039;
+          font-size: 15px;
+          line-height: 1.55;
+        }
+        .fortune-page .fortune-help-copy p {
+          margin: 0 0 16px;
+        }
+        .fortune-page .fortune-help-copy p:last-child {
+          margin-bottom: 0;
+        }
         .fortune-page .fortune-invite-title {
           margin: 0 0 8px;
           color: #74372c;
@@ -1189,7 +1230,7 @@ export default function CheckinPage() {
           </p>
         </section>
 
-        <button type="button" className="fortune-floating-help" aria-label="Aide">
+        <button type="button" className="fortune-floating-help" onClick={() => setModal("help")} aria-label="Ouvrir l'aide">
           <HelpCircle aria-hidden="true" />
         </button>
       </div>
@@ -1202,14 +1243,45 @@ export default function CheckinPage() {
           aria-labelledby="fortune-modal-title"
           onClick={() => setModal(null)}
         >
-          <div className={`fortune-dialog ${modal === "invite" ? "fortune-invite-dialog" : ""}`} onClick={(event) => event.stopPropagation()}>
+          <div className={`fortune-dialog ${modal === "invite" ? "fortune-invite-dialog" : ""} ${modal === "help" ? "fortune-help-dialog" : ""}`} onClick={(event) => event.stopPropagation()}>
             <div className="fortune-dialog-top" aria-hidden="true" />
             <div className="fortune-medal" aria-hidden="true"><Gift /></div>
             <div className="fortune-dialog-body">
-              <h2 id="fortune-modal-title" className={modal === "invite" ? "fortune-invite-title" : "sr-only"}>
-                {modal === "ranking" ? "Classement" : modal === "records" ? "Enregistrements" : "Inviter des amis"}
+              <h2 id="fortune-modal-title" className={modal === "invite" ? "fortune-invite-title" : modal === "help" ? "fortune-help-title" : "sr-only"}>
+                {modal === "ranking"
+                  ? "Classement"
+                  : modal === "records"
+                    ? "Enregistrements"
+                    : modal === "help"
+                      ? "Comment fonctionne la roue ?"
+                      : "Inviter des amis"}
               </h2>
-              {modal === "invite" ? (
+              {modal === "help" ? (
+                <div className="fortune-help-scroll">
+                  <div className="fortune-help-copy">
+                    <p><strong>Notre programme de parrainage est désormais disponible !</strong></p>
+                    <p>
+                      Pour jouer à la roue, vous devez acheter un produit d&apos;investissement stable et payant.
+                      Cet achat vous donne un tour de roulette gratuit avec 100 % de chance de gagner.
+                      Vous pourrez retirer jusqu&apos;à 5 000 francs CFA immédiatement.
+                    </p>
+                    <p>
+                      Si un utilisateur inscrit via votre lien effectue un dépôt approuvé et achète
+                      un produit d&apos;investissement stable et payant, vous recevez un tour de roulette
+                      gratuit supplémentaire.
+                    </p>
+                    <p>
+                      De plus, vous recevez 25 % de leur investissement en commission. Par exemple,
+                      s&apos;ils investissent 100 000 francs CFA, vous recevez 25 000 francs CFA de commission.
+                      Les commissions sont retirables instantanément.
+                    </p>
+                    <p>
+                      Les montants affichés sur la roue restent inchangés, mais le gain réellement
+                      crédité par tirage ne peut jamais dépasser 500 francs CFA.
+                    </p>
+                  </div>
+                </div>
+              ) : modal === "invite" ? (
                 <div className="fortune-invite-content">
                   <p className="fortune-invite-lead">
                     Scannez ce QR code ou partagez votre lien pour inviter vos amis.
