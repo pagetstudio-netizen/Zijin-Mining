@@ -22,6 +22,7 @@ type FortuneOutcome = {
   won: boolean;
   reward: number | null;
   message: string;
+  inviteCta?: boolean;
 };
 
 const wheelValues = ["5", "10", "30", "100", "300", "1000", "2000", "5000"];
@@ -153,7 +154,12 @@ export default function CheckinPage() {
   });
 
   const showNoDrawsMessage = () => {
-    showLossPopup(`Nombre de tours restants : ${remainingSpins}. Obtenez un tour pour rejouer.`);
+    setFortuneOutcome({
+      won: false,
+      reward: null,
+      inviteCta: true,
+      message: "Solde de roue : 0\nNombre de tours restants : 0\nInvitez vos amis pour gagner gratuitement de nouveaux tours.",
+    });
   };
 
   const copyInviteLink = async () => {
@@ -959,6 +965,10 @@ export default function CheckinPage() {
           border-color: #ffb39f;
           background: linear-gradient(180deg, #fff9f5 0%, #ffe1d8 100%);
         }
+        .fortune-page .fortune-result-card.is-invite {
+          border-color: #f2cf83;
+          background: linear-gradient(180deg, #fffdf0 0%, #ffe7ad 100%);
+        }
         @keyframes fortune-result-pop {
           from { opacity: 0; transform: scale(.96) translateY(4px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
@@ -982,6 +992,14 @@ export default function CheckinPage() {
           border-color: #ffe4dc;
           background: linear-gradient(145deg, #ff9b83, #d94332);
         }
+        .fortune-page .fortune-result-card.is-invite .fortune-result-badge {
+          border-color: #fff4c8;
+          background: linear-gradient(145deg, #f3b83f, #d97818);
+        }
+        .fortune-page .fortune-result-card.is-invite .fortune-result-badge svg {
+          width: 38px;
+          height: 38px;
+        }
         .fortune-page .fortune-result-card h2 {
           margin: 0;
           font-size: 27px;
@@ -998,6 +1016,7 @@ export default function CheckinPage() {
           color: #7a4a3e;
           font-size: 15px;
           line-height: 1.45;
+          white-space: pre-line;
         }
         .fortune-page .fortune-result-close {
           width: 78%;
@@ -1304,14 +1323,18 @@ export default function CheckinPage() {
           onClick={() => setFortuneOutcome(null)}
         >
           <div
-            className={`fortune-result-card ${fortuneOutcome.won ? "is-win" : "is-loss"}`}
+            className={`fortune-result-card ${fortuneOutcome.won ? "is-win" : "is-loss"} ${fortuneOutcome.inviteCta ? "is-invite" : ""}`}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="fortune-result-badge" aria-hidden="true">
-              {fortuneOutcome.won ? "✓" : "×"}
+              {fortuneOutcome.inviteCta ? <Share2 aria-hidden="true" /> : fortuneOutcome.won ? "✓" : "×"}
             </div>
             <h2 id="fortune-result-title">
-              {fortuneOutcome.won ? "Vous avez gagné !" : "Dommage, vous avez perdu"}
+              {fortuneOutcome.inviteCta
+                ? "Solde de roue épuisé"
+                : fortuneOutcome.won
+                  ? "Vous avez gagné !"
+                  : "Dommage, vous avez perdu"}
             </h2>
             {fortuneOutcome.won && fortuneOutcome.reward !== null ? (
               <p className="fortune-result-amount">
@@ -1322,9 +1345,12 @@ export default function CheckinPage() {
             <button
               type="button"
               className="fortune-result-close"
-              onClick={() => setFortuneOutcome(null)}
+              onClick={() => {
+                setFortuneOutcome(null);
+                if (fortuneOutcome.inviteCta) navigate("/team");
+              }}
             >
-              Continuer
+              {fortuneOutcome.inviteCta ? "Inviter des amis" : "Continuer"}
             </button>
           </div>
         </div>
