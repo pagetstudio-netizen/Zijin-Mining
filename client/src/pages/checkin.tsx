@@ -1,4 +1,4 @@
-import { type CSSProperties, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { ArrowLeft, BarChart3, FileText, Gift, HelpCircle, Share2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +41,20 @@ export default function CheckinPage() {
   const [fortuneOutcome, setFortuneOutcome] = useState<FortuneOutcome | null>(null);
   const spinRequestLocked = useRef(false);
   const spinDuration = 3400;
+
+  useEffect(() => {
+    if (!modal && !fortuneOutcome) return;
+
+    const htmlOverflow = document.documentElement.style.overflow;
+    const bodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = htmlOverflow;
+      document.body.style.overflow = bodyOverflow;
+    };
+  }, [modal, fortuneOutcome]);
 
   const {
     data: fortuneStatus,
@@ -505,9 +519,10 @@ export default function CheckinPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow-y: auto;
+          overflow: hidden;
           padding: 28px 17px;
           background: rgba(53, 23, 18, .66);
+          overscroll-behavior: none;
         }
         .fortune-page .fortune-dialog {
           position: relative;
@@ -721,8 +736,10 @@ export default function CheckinPage() {
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
           padding: 24px;
           background: rgba(76, 25, 17, .72);
+          overscroll-behavior: none;
         }
         .fortune-page .fortune-result-card {
           width: min(100%, 360px);
@@ -733,14 +750,14 @@ export default function CheckinPage() {
           box-shadow: 0 16px 34px rgba(55, 20, 9, .42);
           color: #5a241a;
           text-align: center;
-          animation: fortune-result-pop .28s ease-out;
+          animation: fortune-result-pop .18s ease-out;
         }
         .fortune-page .fortune-result-card.is-loss {
           border-color: #ffb39f;
           background: linear-gradient(180deg, #fff9f5 0%, #ffe1d8 100%);
         }
         @keyframes fortune-result-pop {
-          from { opacity: 0; transform: scale(.82) translateY(12px); }
+          from { opacity: 0; transform: scale(.96) translateY(4px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .fortune-page .fortune-result-badge {
